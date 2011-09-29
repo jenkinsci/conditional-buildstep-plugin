@@ -1,0 +1,42 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.jenkins-ci.plugins</groupId>
+		<artifactId>plugin</artifactId>
+		<version>1.417</version>
+	</parent>
+
+	<groupId>org.jenkins-ci.plugins</groupId>
+	<artifactId>conditional-buildstep</artifactId>
+	<version>1.0-SNAPSHOT</version>
+
+	<packaging>hpi</packaging>
+
+	<name>conditional-buildstep</name>
+	<url>https://wiki.jenkins-ci.org/display/JENKINS/NodeLabel+Parameter+Plugin</url>
+	<scm>
+		<connection>scm:git:git://github.com/jenkinsci/nodelabelparameter-plugin.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/jenkinsci/nodelabelparameter-plugin.git</developerConnection>
+		<url>https://github.com/jenkinsci/nodelabelparameter-plugin</url>
+	</scm>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<developers>
+		<developer>
+			<id>imod</id>
+			<name>domi</name>
+			<email></email>
+		</developer>
+	</developers>
+	<dependencies>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>token-macro</artifactId>
+			<version>1.4</version>
+		</dependency>
+	</dependencies>
+</project>
