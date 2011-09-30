@@ -29,7 +29,8 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
- * 
+ * A buildstep wrapping any number of other buildsteps, controlling there
+ * execution based on a defined condition.
  * 
  * @author domi (imod)
  */

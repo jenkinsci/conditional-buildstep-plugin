@@ -1,0 +1,15 @@
+Conditional BuildStep Plugin for Jenkins
+========================================
+
+Licensed under [MIT Licence].
+ 
+About
+-----
+A buildstep wrapping any number of other buildsteps, controlling there execution based on a defined condition.
+
+Wiki and Info
+-------------
+User documentation for the plugin can be found on the [wiki]
+
+[wiki]: https://wiki.jenkins-ci.org/display/JENKINS/Conditional+BuildStep+Plugin
+

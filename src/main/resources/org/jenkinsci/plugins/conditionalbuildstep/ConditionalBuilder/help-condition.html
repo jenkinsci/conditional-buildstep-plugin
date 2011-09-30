@@ -1,5 +1,10 @@
 <div>
-    Help file for fields are discovered through a file name convention. This file is an line help for
-    the "name" field. You can have <i>arbitrary</i> HTML here. You can write this file as a Jelly script
-    if you need a dynamic content (but if you do so, change the extension to .jelly)
+    Condition to control the execution of all the contained builders. The resolved value has to be <code>true</code> or <code>false</code> (where everything else then <code>true</code> is handled as <code>false</code>, case ignored).<br>
+    The following definitions are supported:
+    <ul>
+    	<li>fix value <code>true</code> or <code>false</code></li>
+    	<li>reference of a build parameter (e.g. <code>${DOIT}</code>)</li>
+    	<li>as TokenMacro consumer (install any plugin from the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Token+Macro+Plugin">TokenMacro Producer List</a>)</li>
+    </ul>
+    With the checkbox it is possible to invert the resolved condition.
 </div>
