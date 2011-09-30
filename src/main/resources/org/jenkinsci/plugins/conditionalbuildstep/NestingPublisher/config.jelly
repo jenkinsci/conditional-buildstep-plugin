@@ -1,0 +1,18 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+	<f:block>
+		<div style="padding-left: 2em">
+			<fieldset style="margin-bottom:1em">
+				<table width="100%">
+					<f:section>
+						<f:nested>
+							<f:hetero-list name="nestingpublishers" hasHeader="true" descriptors="${descriptor.getBuilderDescriptors(it)}" items="${instance.nestingpublishers}"
+								addCaption="${%Add publisher}" />
+						</f:nested>
+					</f:section>
+				</table>
+			</fieldset>
+		</div>
+	</f:block>
+
+</j:jelly>
