@@ -128,8 +128,7 @@ public class ConditionalBuilder extends Builder {
 		 * 
 		 * @param value
 		 *            This parameter receives the value that the user has typed.
-		 * @return Indicates the outcome of the validation. This is sent to the
-		 *         browser.
+		 * @return Indicates the outcome of the validation.
 		 */
 		public FormValidation doCheckCondition(@QueryParameter String value) throws IOException, ServletException {
 			if (value.length() == 0) {
@@ -139,6 +138,7 @@ public class ConditionalBuilder extends Builder {
 				return FormValidation.warning("do you realy want to hard code the condition?");
 			}
 			return FormValidation.ok();
+
 		}
 
 		public boolean isApplicable(Class<? extends AbstractProject> aClass) {
