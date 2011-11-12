@@ -7,7 +7,7 @@
 		<f:checkbox title="${%invert}" checked="${instance.isInvertCondition()}" />
 	</f:entry>
 	<f:entry>
-		<f:dropdownDescriptorSelector title="${%runCondition}" field="condition" descriptors="${descriptor.runConditions}" />
+		<f:dropdownDescriptorSelector title="${%runCondition}" field="runCondition" descriptors="${descriptor.runConditions}" />
 	</f:entry>
 	<f:advanced>
 		<f:entry>
