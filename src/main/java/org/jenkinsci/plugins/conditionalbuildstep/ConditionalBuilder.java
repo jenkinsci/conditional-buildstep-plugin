@@ -1,29 +1,27 @@
 package org.jenkinsci.plugins.conditionalbuildstep;
 
+import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
-import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
-import hudson.util.VariableResolver;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
 import net.sf.json.JSONObject;
 
-import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
-import org.jenkinsci.plugins.tokenmacro.TokenMacro;
+import org.jenkins_ci.plugins.run_condition.RunCondition;
+import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -39,13 +37,26 @@ public class ConditionalBuilder extends Builder {
 
 	private final String condition;
 	private final boolean invertCondition;
+	private final BuildStepRunner runner;
+	private final RunCondition runCondition;
 
 	private List<Builder> conditionalbuilders = new ArrayList<Builder>();
 
 	@DataBoundConstructor
-	public ConditionalBuilder(String condition, boolean invert) {
+	public ConditionalBuilder(String condition, boolean invert, RunCondition runCondition, final BuildStepRunner runner) {
 		this.condition = condition;
 		this.invertCondition = invert;
+		this.runner = runner;
+
+		if (condition != null && condition.length() > 0) {
+			this.runCondition = new LegacyCondition(condition, invert);
+		} else {
+			this.runCondition = runCondition;
+		}
+	}
+
+	public BuildStepRunner getRunner() {
+		return runner;
 	}
 
 	public String getCondition() {
@@ -64,56 +75,12 @@ public class ConditionalBuilder extends Builder {
 		this.conditionalbuilders = conditionalbuilders;
 	}
 
-	@Override
-	public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-
-		String resolvedCondition = condition;
-		try {
-			resolvedCondition = TokenMacro.expand(build, listener, condition);
-		} catch (MacroEvaluationException e) {
-
-			log.log(Level.FINE, "failed to resolve condition via TokenMacro: {0}", e.getMessage());
-
-			final VariableResolver<String> variableResolver = build.getBuildVariableResolver();
-			resolvedCondition = resolveVariable(variableResolver, condition);
-		}
-
-		resolvedCondition = resolvedCondition == null ? condition : resolvedCondition;
-		final boolean execute = invertCondition ? !"true".equalsIgnoreCase(resolvedCondition.trim()) : "true".equalsIgnoreCase(resolvedCondition.trim());
-		listener.getLogger().println(
-				"ConditionalStep  [" + condition + "] evaluated to [" + resolvedCondition + "] (invert: " + invertCondition + ") execute --> " + execute);
-		if (!execute) {
-			return true;
-		}
-
-		boolean shouldContinue = true;
-		for (BuildStep buildStep : conditionalbuilders) {
-			if (!shouldContinue) {
-				break;
-			}
-			shouldContinue = buildStep.prebuild(build, listener);
-		}
-
-		// execute build step, stop processing if indicated
-		for (BuildStep buildStep : conditionalbuilders) {
-			if (!shouldContinue) {
-				break;
-			}
-			shouldContinue = buildStep.perform(build, launcher, listener);
-		}
-		return shouldContinue;
+	public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
+		return runner.prebuild(runCondition, new ListBuilder(conditionalbuilders), build, listener);
 	}
 
-	public static String resolveVariable(VariableResolver<String> variableResolver, String potentalVaraible) {
-		String value = potentalVaraible;
-		if (potentalVaraible != null) {
-			if (potentalVaraible.startsWith("${") && potentalVaraible.endsWith("}")) {
-				value = potentalVaraible.substring(2, potentalVaraible.length() - 1);
-				value = variableResolver.resolve(value);
-				log.log(Level.FINE, "resolve " + potentalVaraible + " to " + value);
-			}
-		}
-		return value;
+	public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
+		return runner.perform(runCondition, new ListBuilder(conditionalbuilders), build, launcher, listener);
 	}
 
 	@Override
@@ -176,6 +143,15 @@ public class ConditionalBuilder extends Builder {
 			}
 			return filteredDescriptors;
 		}
+
+		public DescriptorExtensionList<BuildStepRunner, BuildStepRunner.BuildStepRunnerDescriptor> getBuildStepRunners() {
+			return BuildStepRunner.all();
+		}
+
+		public List<? extends Descriptor<? extends RunCondition>> getRunConditions() {
+			return RunCondition.all();
+		}
+
 	}
 
 }

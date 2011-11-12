@@ -6,6 +6,14 @@
 	<f:entry field="invert">
 		<f:checkbox title="${%invert}" checked="${instance.isInvertCondition()}" />
 	</f:entry>
+	<f:entry>
+		<f:dropdownDescriptorSelector title="${%runCondition}" field="condition" descriptors="${descriptor.runConditions}" />
+	</f:entry>
+	<f:advanced>
+		<f:entry>
+			<f:dropdownDescriptorSelector title="${%runner}" field="runner" descriptors="${descriptor.buildStepRunners}" />
+		</f:entry>
+	</f:advanced>
 
 	<f:block>
 		<div style="padding-left: 2em">
@@ -21,4 +29,6 @@
 			</fieldset>
 		</div>
 	</f:block>
+
+
 </j:jelly>
