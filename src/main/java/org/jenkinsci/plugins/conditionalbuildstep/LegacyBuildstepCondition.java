@@ -23,17 +23,25 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * 
  * @author domi
  */
-public class LegacyCondition extends RunCondition {
+public class LegacyBuildstepCondition extends RunCondition {
 
-	private static Logger log = Logger.getLogger(LegacyCondition.class.getName());
+	private static Logger log = Logger.getLogger(LegacyBuildstepCondition.class.getName());
 
 	private final String condition;
 	private final boolean invertCondition;
 
 	@DataBoundConstructor
-	public LegacyCondition(String condition, boolean invert) {
+	public LegacyBuildstepCondition(String condition, boolean invert) {
 		this.condition = condition;
 		this.invertCondition = invert;
+	}
+
+	public String getCondition() {
+		return condition;
+	}
+
+	public boolean isInvertCondition() {
+		return invertCondition;
 	}
 
 	@Override
@@ -84,7 +92,7 @@ public class LegacyCondition extends RunCondition {
 
 		@Override
 		public String getDisplayName() {
-			return "Legacy condition (deprecated)";
+			return "Legacy boolean condition (deprecated)";
 		}
 
 	}

@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <logRotator>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.BooleanParameterDefinition>
+          <name>DOIT</name>
+          <description></description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder>
+      <condition>${DOIT}</condition>
+      <invertCondition>true</invertCondition>
+      <conditionalbuilders>
+        <hudson.tasks.Shell>
+          <command>echo &quot;entweder&quot;</command>
+        </hudson.tasks.Shell>
+        <hudson.tasks.Ant>
+          <targets>doit</targets>
+          <antName>(Default)</antName>
+        </hudson.tasks.Ant>
+      </conditionalbuilders>
+    </org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder>
+    <hudson.tasks.Shell>
+      <command>echo &quot;immer da&quot;</command>
+    </hudson.tasks.Shell>
+    <org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder>
+      <condition>${DOIT}</condition>
+      <invertCondition>false</invertCondition>
+      <conditionalbuilders>
+        <hudson.tasks.Shell>
+          <command>echo &quot;oder&quot;</command>
+        </hudson.tasks.Shell>
+        <hudson.tasks.Maven>
+          <targets>clean</targets>
+          <usePrivateRepository>false</usePrivateRepository>
+        </hudson.tasks.Maven>
+      </conditionalbuilders>
+    </org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

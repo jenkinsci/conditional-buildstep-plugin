@@ -1,5 +1,6 @@
 <div>
-    Condition to control the execution of all the contained builders. The resolved value has to be <code>true</code> or <code>false</code> (where everything else then <code>true</code> is handled as <code>false</code>, case ignored).<br>
+	Used to retain backward compatibility... please use the 'Boolean condition'
+    The resolved value has to be <code>true</code> or <code>false</code> (where everything else then <code>true</code> is handled as <code>false</code>, case ignored).<br />
     The following definitions are supported:
     <ul>
     	<li>fix value <code>true</code> or <code>false</code></li>

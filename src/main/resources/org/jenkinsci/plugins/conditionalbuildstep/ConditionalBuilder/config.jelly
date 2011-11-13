@@ -1,11 +1,5 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
-	<f:entry title="Condition" field="condition">
-		<f:textbox />
-	</f:entry>
-	<f:entry field="invert">
-		<f:checkbox title="${%invert}" checked="${instance.isInvertCondition()}" />
-	</f:entry>
 	<f:entry>
 		<f:dropdownDescriptorSelector title="${%runCondition}" field="runCondition" descriptors="${descriptor.runConditions}" />
 	</f:entry>
@@ -22,7 +16,7 @@
 					<f:section title="${%Steps to run if condition is met}">
 						<f:nested>
 							<f:hetero-list name="conditionalbuilders" hasHeader="true" descriptors="${descriptor.getBuilderDescriptors(it)}" items="${instance.conditionalbuilders}"
-								addCaption="${%Add step}" />
+								addCaption="${%Add step to condition}" />
 						</f:nested>
 					</f:section>
 				</table>

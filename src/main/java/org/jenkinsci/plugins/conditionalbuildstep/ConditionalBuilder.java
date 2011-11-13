@@ -35,36 +35,26 @@ import org.kohsuke.stapler.StaplerRequest;
 public class ConditionalBuilder extends Builder {
 	private static Logger log = Logger.getLogger(ConditionalBuilder.class.getName());
 
-	private final String condition;
-	private final boolean invertCondition;
-	private final BuildStepRunner runner;
-	private final RunCondition runCondition;
+	// retaining backward compatibility
+	private transient String condition;
+	private transient boolean invertCondition;
 
+	private final BuildStepRunner runner;
+	private RunCondition runCondition;
 	private List<Builder> conditionalbuilders = new ArrayList<Builder>();
 
 	@DataBoundConstructor
-	public ConditionalBuilder(String condition, boolean invert, RunCondition runCondition, final BuildStepRunner runner) {
-		this.condition = condition;
-		this.invertCondition = invert;
+	public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner) {
 		this.runner = runner;
-
-		if (condition != null && condition.length() > 0) {
-			this.runCondition = new LegacyCondition(condition, invert);
-		} else {
-			this.runCondition = runCondition;
-		}
+		this.runCondition = runCondition;
 	}
 
 	public BuildStepRunner getRunner() {
 		return runner;
 	}
 
-	public String getCondition() {
-		return condition;
-	}
-
-	public boolean isInvertCondition() {
-		return invertCondition;
+	public RunCondition getRunCondition() {
+		return runCondition;
 	}
 
 	public List<Builder> getConditionalbuilders() {
@@ -81,6 +71,14 @@ public class ConditionalBuilder extends Builder {
 
 	public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
 		return runner.perform(runCondition, new ListBuilder(conditionalbuilders), build, launcher, listener);
+	}
+
+	public Object readResolve() {
+		if (condition != null) {
+			// retaining backward compatibility
+			this.runCondition = new LegacyBuildstepCondition(condition, invertCondition);
+		}
+		return this;
 	}
 
 	@Override
