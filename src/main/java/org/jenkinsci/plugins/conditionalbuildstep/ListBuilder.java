@@ -1,13 +1,18 @@
 package org.jenkinsci.plugins.conditionalbuildstep;
 
+import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.tasks.BuildStep;
+import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 
 import java.io.IOException;
 import java.util.List;
+
+import org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder.DescriptorImpl;
 
 public class ListBuilder extends Builder {
 
@@ -41,4 +46,24 @@ public class ListBuilder extends Builder {
 		return shouldContinue;
 	}
 
+	@Override
+	public DescriptorImpl getDescriptor() {
+		return (DescriptorImpl) super.getDescriptor();
+	}
+
+	@Extension
+	public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+
+		@Override
+		public boolean isApplicable(Class<? extends AbstractProject> jobType) {
+			return false;
+		}
+
+		@Override
+		public String getDisplayName() {
+//			return "should not be visable desc";
+			return null;
+		}
+
+	}
 }

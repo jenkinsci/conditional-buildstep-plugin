@@ -1,3 +1,3 @@
 <div>
-  A buildstep wrapping any number of other buildsteps, controlling there execution based on a defined condition (e.g. BuildParameter or <a href="https://wiki.jenkins-ci.org/display/JENKINS/Token+Macro+Plugin">TokenMacro</a>). 
+  A buildstep wrapping any number of other buildsteps, controlling there execution based on a defined condition (e.g. BuildParameter). 
 </div>
