@@ -32,15 +32,14 @@ import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 
-import org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder;
-import org.jenkinsci.plugins.conditionalbuildstep.singlestep.Messages;
-import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
-import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder.SingleConditionalBuilderDescriptor;
-import org.kohsuke.stapler.DataBoundConstructor;
-
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder;
+import org.jenkinsci.plugins.conditionalbuildstep.singlestep.Messages;
+import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 public class DefaultBuilderDescriptorLister implements BuilderDescriptorLister {
 

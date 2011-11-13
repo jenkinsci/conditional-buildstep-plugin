@@ -7,18 +7,14 @@ import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
-import hudson.model.Descriptor.FormException;
 import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
-import hudson.util.FormValidation;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-
-import javax.servlet.ServletException;
 
 import net.sf.json.JSONObject;
 
@@ -26,9 +22,7 @@ import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
 import org.jenkinsci.plugins.conditionalbuildstep.lister.BuilderDescriptorLister;
 import org.jenkinsci.plugins.conditionalbuildstep.lister.DefaultBuilderDescriptorLister;
-import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder.SingleConditionalBuilderDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 

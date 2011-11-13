@@ -25,8 +25,8 @@
 package org.jenkinsci.plugins.conditionalbuildstep.lister;
 
 import hudson.ExtensionPoint;
-import hudson.model.AbstractProject;
 import hudson.model.Describable;
+import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.tasks.BuildStep;
 
