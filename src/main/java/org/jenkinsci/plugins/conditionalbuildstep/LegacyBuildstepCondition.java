@@ -6,16 +6,20 @@ package org.jenkinsci.plugins.conditionalbuildstep;
 import hudson.Extension;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
+import hudson.util.FormValidation;
 import hudson.util.VariableResolver;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletException;
+
 import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 /**
  * Legacy condition to ease migration from old condition to new condition mecano
@@ -93,6 +97,24 @@ public class LegacyBuildstepCondition extends RunCondition {
 		@Override
 		public String getDisplayName() {
 			return "Legacy boolean condition (deprecated)";
+		}
+
+		/**
+		 * Performs on-the-fly validation of the form field 'condition'.
+		 * 
+		 * @param value
+		 *            This parameter receives the value that the user has typed.
+		 * @return Indicates the outcome of the validation.
+		 */
+		public FormValidation doCheckCondition(@QueryParameter String value) throws IOException, ServletException {
+			if (value.length() == 0) {
+				return FormValidation.error("Please define a condition");
+			}
+			if (!value.startsWith("${")) {
+				return FormValidation.warning("do you realy want to hard code the condition?");
+			}
+			return FormValidation.ok();
+
 		}
 
 	}

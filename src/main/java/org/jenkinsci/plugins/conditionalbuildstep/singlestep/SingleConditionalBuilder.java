@@ -47,6 +47,8 @@ import net.sf.json.JSONObject;
 import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
 import org.jenkins_ci.plugins.run_condition.core.AlwaysRun;
+import org.jenkinsci.plugins.conditionalbuildstep.lister.BuilderDescriptorLister;
+import org.jenkinsci.plugins.conditionalbuildstep.lister.DefaultBuilderDescriptorLister;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;

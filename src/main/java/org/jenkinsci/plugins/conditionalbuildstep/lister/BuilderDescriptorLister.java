@@ -22,7 +22,7 @@
 * THE SOFTWARE.
 */
 
-package org.jenkinsci.plugins.conditionalbuildstep.singlestep;
+package org.jenkinsci.plugins.conditionalbuildstep.lister;
 
 import hudson.ExtensionPoint;
 import hudson.model.AbstractProject;

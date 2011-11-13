@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.conditionalbuildstep.singlestep;
+package org.jenkinsci.plugins.conditionalbuildstep.lister;
 
 import hudson.Extension;
 import hudson.model.AbstractProject;
@@ -33,6 +33,9 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 
 import org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder;
+import org.jenkinsci.plugins.conditionalbuildstep.singlestep.Messages;
+import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
+import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder.SingleConditionalBuilderDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.lang.reflect.Constructor;

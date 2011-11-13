@@ -7,6 +7,8 @@ import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
+import hudson.model.Descriptor.FormException;
+import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
@@ -22,8 +24,12 @@ import net.sf.json.JSONObject;
 
 import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
+import org.jenkinsci.plugins.conditionalbuildstep.lister.BuilderDescriptorLister;
+import org.jenkinsci.plugins.conditionalbuildstep.lister.DefaultBuilderDescriptorLister;
+import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder.SingleConditionalBuilderDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -66,11 +72,11 @@ public class ConditionalBuilder extends Builder {
 	}
 
 	public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
-		return runner.prebuild(runCondition, new ListBuilder(conditionalbuilders), build, listener);
+		return runner.prebuild(runCondition, new BuilderChain(conditionalbuilders), build, listener);
 	}
 
 	public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
-		return runner.perform(runCondition, new ListBuilder(conditionalbuilders), build, launcher, listener);
+		return runner.perform(runCondition, new BuilderChain(conditionalbuilders), build, launcher, listener);
 	}
 
 	public Object readResolve() {
@@ -89,22 +95,12 @@ public class ConditionalBuilder extends Builder {
 	@Extension
 	public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
-		/**
-		 * Performs on-the-fly validation of the form field 'condition'.
-		 * 
-		 * @param value
-		 *            This parameter receives the value that the user has typed.
-		 * @return Indicates the outcome of the validation.
-		 */
-		public FormValidation doCheckCondition(@QueryParameter String value) throws IOException, ServletException {
-			if (value.length() == 0) {
-				return FormValidation.error("Please define a condition");
-			}
-			if (!value.startsWith("${")) {
-				return FormValidation.warning("do you realy want to hard code the condition?");
-			}
-			return FormValidation.ok();
+		private BuilderDescriptorLister builderLister;
 
+		public DescriptorImpl() {
+			if (builderLister == null) {
+				builderLister = new DefaultBuilderDescriptorLister();
+			}
 		}
 
 		public boolean isApplicable(Class<? extends AbstractProject> aClass) {
@@ -131,15 +127,10 @@ public class ConditionalBuilder extends Builder {
 			return instance;
 		}
 
-		public static List<Descriptor<Builder>> getBuilderDescriptors(AbstractProject<?, ?> project) {
-			final List<Descriptor<Builder>> descriptors = BuildStepDescriptor.filter(Builder.all(), project.getClass());
-			final List<Descriptor<Builder>> filteredDescriptors = new ArrayList<Descriptor<Builder>>();
-			for (Descriptor<Builder> descriptor : descriptors) {
-				if (!descriptor.getClass().equals(DescriptorImpl.class)) {
-					filteredDescriptors.add(descriptor);
-				}
-			}
-			return filteredDescriptors;
+		public List<? extends Descriptor<? extends BuildStep>> getBuilderDescriptors(AbstractProject<?, ?> project) {
+			if (project == null)
+				project = Stapler.getCurrentRequest().findAncestorObject(AbstractProject.class);
+			return builderLister.getAllowedBuilders(project);
 		}
 
 		public DescriptorExtensionList<BuildStepRunner, BuildStepRunner.BuildStepRunnerDescriptor> getBuildStepRunners() {
@@ -148,6 +139,21 @@ public class ConditionalBuilder extends Builder {
 
 		public List<? extends Descriptor<? extends RunCondition>> getRunConditions() {
 			return RunCondition.all();
+		}
+
+		// public List<? extends Descriptor<? extends BuildStep>>
+		// getAllowedBuilders(AbstractProject<?, ?> project) {
+		// if (project == null)
+		// project =
+		// Stapler.getCurrentRequest().findAncestorObject(AbstractProject.class);
+		// return builderLister.getAllowedBuilders(project);
+		// }
+
+		public Object readResolve() {
+			if (builderLister == null) {
+				builderLister = new DefaultBuilderDescriptorLister();
+			}
+			return this;
 		}
 
 	}

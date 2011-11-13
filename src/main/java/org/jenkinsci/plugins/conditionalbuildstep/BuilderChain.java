@@ -12,13 +12,18 @@ import hudson.tasks.Builder;
 import java.io.IOException;
 import java.util.List;
 
-import org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder.DescriptorImpl;
-
-public class ListBuilder extends Builder {
+/**
+ * a builder not directly configurable via UI, instances are only created for
+ * transitive usage t wrap the execution of multiple builders
+ * 
+ * @author domi
+ * 
+ */
+public class BuilderChain extends Builder {
 
 	private final List<Builder> conditionalbuilders;
 
-	public ListBuilder(final List<Builder> conditionalbuilders) {
+	public BuilderChain(final List<Builder> conditionalbuilders) {
 		this.conditionalbuilders = conditionalbuilders;
 	}
 
@@ -61,7 +66,7 @@ public class ListBuilder extends Builder {
 
 		@Override
 		public String getDisplayName() {
-//			return "should not be visable desc";
+			// return "should not be visable desc";
 			return null;
 		}
 
