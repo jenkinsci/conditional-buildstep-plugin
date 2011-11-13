@@ -1,3 +1,5 @@
 work
 .idea/
 *.iml
+target/
+*~
