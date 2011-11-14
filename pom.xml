@@ -26,13 +26,28 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	<licenses>
+		<license>
+			<name>The MIT license</name>
+			<comments>All source code is under the MIT license.</comments>
+		</license>
+	</licenses>
 	<developers>
 		<developer>
 			<id>imod</id>
 			<name>domi</name>
 			<email />
 		</developer>
+		<developer>
+			<id>bap</id>
+			<name>Bap</name>
+			<email>bap-jenkins@BapIT.co.uk</email>
+		</developer>
 	</developers>
+	<issueManagement>
+		<system>JIRA</system>
+		<url>http://issues.jenkins-ci.org/</url>
+	</issueManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.jenkins-ci.plugins</groupId>
