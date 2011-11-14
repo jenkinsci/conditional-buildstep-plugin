@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * a builder not directly configurable via UI, instances are only created for
- * transitive usage t wrap the execution of multiple builders
+ * A builder not directly configurable via UI, instances are only created for
+ * transitive usage to wrap the execution of multiple builders.
  * 
  * @author domi
  * 
@@ -66,8 +66,7 @@ public class BuilderChain extends Builder {
 
 		@Override
 		public String getDisplayName() {
-			// return "should not be visable desc";
-			return null;
+			return "should not be visable (" + BuilderChain.class.getSimpleName() + ")";
 		}
 
 	}

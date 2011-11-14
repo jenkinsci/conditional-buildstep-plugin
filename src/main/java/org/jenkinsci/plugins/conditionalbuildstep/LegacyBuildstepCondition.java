@@ -26,7 +26,9 @@ import org.kohsuke.stapler.QueryParameter;
  * implemented by the run-condition-plugin
  * 
  * @author domi
+ * @deprecated keep to retain backward compatibility
  */
+@Deprecated
 public class LegacyBuildstepCondition extends RunCondition {
 
 	private static Logger log = Logger.getLogger(LegacyBuildstepCondition.class.getName());
@@ -96,7 +98,7 @@ public class LegacyBuildstepCondition extends RunCondition {
 
 		@Override
 		public String getDisplayName() {
-			return "Legacy boolean condition (deprecated)";
+			return Messages.legacycondition_displayName();
 		}
 
 		/**
@@ -114,7 +116,6 @@ public class LegacyBuildstepCondition extends RunCondition {
 				return FormValidation.warning("do you realy want to hard code the condition?");
 			}
 			return FormValidation.ok();
-
 		}
 
 	}

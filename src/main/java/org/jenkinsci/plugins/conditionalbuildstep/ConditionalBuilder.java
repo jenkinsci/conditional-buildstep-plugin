@@ -3,10 +3,12 @@ package org.jenkinsci.plugins.conditionalbuildstep;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.matrix.MatrixProject;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
+import hudson.model.Hudson;
 import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -18,12 +20,12 @@ import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
 
+import org.jenkinsci.plugins.conditionalbuildstep.Messages;
 import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
-import org.jenkinsci.plugins.conditionalbuildstep.lister.BuilderDescriptorLister;
-import org.jenkinsci.plugins.conditionalbuildstep.lister.DefaultBuilderDescriptorLister;
+import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
+import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder.SingleConditionalBuilderDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -89,23 +91,17 @@ public class ConditionalBuilder extends Builder {
 	@Extension
 	public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
-		private BuilderDescriptorLister builderLister;
-
-		public DescriptorImpl() {
-			if (builderLister == null) {
-				builderLister = new DefaultBuilderDescriptorLister();
-			}
-		}
-
-		public boolean isApplicable(Class<? extends AbstractProject> aClass) {
-			return true;
+		public boolean isApplicable(final Class<? extends AbstractProject> aClass) {
+			// @TODO enable for matrix builds - requires aggregation
+			// return FreeStyleProject.class.equals(aClass);
+			return !MatrixProject.class.equals(aClass) && !SingleConditionalBuilder.PROMOTION_JOB_TYPE.equals(aClass.getCanonicalName());
 		}
 
 		/**
 		 * This human readable name is used in the configuration screen.
 		 */
 		public String getDisplayName() {
-			return "Conditional Steps";
+			return Messages.multistepbuilder_displayName();
 		}
 
 		@Override
@@ -122,9 +118,9 @@ public class ConditionalBuilder extends Builder {
 		}
 
 		public List<? extends Descriptor<? extends BuildStep>> getBuilderDescriptors(AbstractProject<?, ?> project) {
-			if (project == null)
-				project = Stapler.getCurrentRequest().findAncestorObject(AbstractProject.class);
-			return builderLister.getAllowedBuilders(project);
+			final SingleConditionalBuilderDescriptor singleConditionalStepDescriptor = Hudson.getInstance().getDescriptorByType(
+					SingleConditionalBuilderDescriptor.class);
+			return singleConditionalStepDescriptor.getAllowedBuilders(project);
 		}
 
 		public DescriptorExtensionList<BuildStepRunner, BuildStepRunner.BuildStepRunnerDescriptor> getBuildStepRunners() {
@@ -133,21 +129,6 @@ public class ConditionalBuilder extends Builder {
 
 		public List<? extends Descriptor<? extends RunCondition>> getRunConditions() {
 			return RunCondition.all();
-		}
-
-		// public List<? extends Descriptor<? extends BuildStep>>
-		// getAllowedBuilders(AbstractProject<?, ?> project) {
-		// if (project == null)
-		// project =
-		// Stapler.getCurrentRequest().findAncestorObject(AbstractProject.class);
-		// return builderLister.getAllowedBuilders(project);
-		// }
-
-		public Object readResolve() {
-			if (builderLister == null) {
-				builderLister = new DefaultBuilderDescriptorLister();
-			}
-			return this;
 		}
 
 	}

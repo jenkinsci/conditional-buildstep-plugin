@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder;
-import org.jenkinsci.plugins.conditionalbuildstep.singlestep.Messages;
+import org.jenkinsci.plugins.conditionalbuildstep.Messages;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -63,7 +63,7 @@ public class DefaultBuilderDescriptorLister implements BuilderDescriptorLister {
 			}
 			BuildStepDescriptor<? extends Builder> buildStepDescriptor = (BuildStepDescriptor) descriptor;
 			if (buildStepDescriptor.isApplicable(project.getClass()) && hasDbc(buildStepDescriptor.clazz))
-			    builders.add(buildStepDescriptor);
+				builders.add(buildStepDescriptor);
 		}
 		return builders;
 	}
