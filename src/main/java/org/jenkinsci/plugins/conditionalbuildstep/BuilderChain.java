@@ -59,6 +59,7 @@ public class BuilderChain extends Builder {
 	@Extension
 	public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
+		@SuppressWarnings("rawtypes")
 		@Override
 		public boolean isApplicable(Class<? extends AbstractProject> jobType) {
 			return false;
@@ -66,7 +67,7 @@ public class BuilderChain extends Builder {
 
 		@Override
 		public String getDisplayName() {
-			return "should not be visable (" + BuilderChain.class.getSimpleName() + ")";
+			return "BuilderChain";
 		}
 
 	}
