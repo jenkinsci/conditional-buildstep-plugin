@@ -1,9 +1,34 @@
+/*
+ * The MIT License
+ *
+ * Copyright (C) 2011 by Dominik Bartholdi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.jenkinsci.plugins.conditionalbuildstep;
 
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.matrix.MatrixProject;
+import hudson.matrix.MatrixAggregatable;
+import hudson.matrix.MatrixAggregator;
+import hudson.matrix.MatrixBuild;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -20,117 +45,137 @@ import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
 
-import org.jenkinsci.plugins.conditionalbuildstep.Messages;
 import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
+import org.jenkinsci.plugins.conditionalbuildstep.matrix.DummyMatrixAggregator;
+import org.jenkinsci.plugins.conditionalbuildstep.matrix.MatrixAggregatorChain;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder.SingleConditionalBuilderDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
- * A buildstep wrapping any number of other buildsteps, controlling there
- * execution based on a defined condition.
+ * A buildstep wrapping any number of other buildsteps, controlling there execution based on a defined condition.
  * 
- * @author domi (imod)
+ * @author Dominik Bartholdi (imod)
  */
-public class ConditionalBuilder extends Builder {
-	private static Logger log = Logger.getLogger(ConditionalBuilder.class.getName());
+public class ConditionalBuilder extends Builder implements MatrixAggregatable {
+    private static Logger log = Logger.getLogger(ConditionalBuilder.class.getName());
 
-	// retaining backward compatibility
-	private transient String condition;
-	private transient boolean invertCondition;
+    // retaining backward compatibility
+    private transient String condition;
+    private transient boolean invertCondition;
 
-	private final BuildStepRunner runner;
-	private RunCondition runCondition;
-	private List<Builder> conditionalbuilders = new ArrayList<Builder>();
+    private final BuildStepRunner runner;
+    private RunCondition runCondition;
+    private List<Builder> conditionalbuilders = new ArrayList<Builder>();
 
-	@DataBoundConstructor
-	public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner) {
-		this.runner = runner;
-		this.runCondition = runCondition;
-	}
+    @DataBoundConstructor
+    public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner) {
+        this.runner = runner;
+        this.runCondition = runCondition;
+    }
 
-	public BuildStepRunner getRunner() {
-		return runner;
-	}
+    public BuildStepRunner getRunner() {
+        return runner;
+    }
 
-	public RunCondition getRunCondition() {
-		return runCondition;
-	}
+    public RunCondition getRunCondition() {
+        return runCondition;
+    }
 
-	public List<Builder> getConditionalbuilders() {
-		return conditionalbuilders;
-	}
+    public List<Builder> getConditionalbuilders() {
+        return conditionalbuilders;
+    }
 
-	public void setConditionalbuilders(List<Builder> conditionalbuilders) {
-		this.conditionalbuilders = conditionalbuilders;
-	}
+    public void setConditionalbuilders(List<Builder> conditionalbuilders) {
+        this.conditionalbuilders = conditionalbuilders;
+    }
 
-	public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
-		return runner.prebuild(runCondition, new BuilderChain(conditionalbuilders), build, listener);
-	}
+    @Override
+    public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
+        return runner.prebuild(runCondition, new BuilderChain(conditionalbuilders), build, listener);
+    }
 
-	public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
-		return runner.perform(runCondition, new BuilderChain(conditionalbuilders), build, launcher, listener);
-	}
+    @Override
+    public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
+        return runner.perform(runCondition, new BuilderChain(conditionalbuilders), build, launcher, listener);
+    }
 
-	public Object readResolve() {
-		if (condition != null) {
-			// retaining backward compatibility
-			this.runCondition = new LegacyBuildstepCondition(condition, invertCondition);
-		}
-		return this;
-	}
+    /**
+     * @see MatrixAggregatable#createAggregator(MatrixBuild, Launcher, BuildListener)
+     */
+    public MatrixAggregator createAggregator(MatrixBuild build, Launcher launcher, BuildListener listener) {
+        // FIXME get the runCondition to tell whether we have to run it or not
+        if (true) {
+            return new DummyMatrixAggregator(build, launcher, listener);
+        }
+        List<MatrixAggregator> aggregators = new ArrayList<MatrixAggregator>();
+        for (BuildStep buildStep : conditionalbuilders) {
+            if (buildStep instanceof MatrixAggregatable) {
+                final MatrixAggregator aggregator = ((MatrixAggregatable) buildStep).createAggregator(build, launcher, listener);
+                if (aggregator != null) {
+                    aggregators.add(aggregator);
+                }
+            }
+        }
+        return new MatrixAggregatorChain(aggregators, build, launcher, listener);
+    }
 
-	@Override
-	public DescriptorImpl getDescriptor() {
-		return (DescriptorImpl) super.getDescriptor();
-	}
+    public Object readResolve() {
+        if (condition != null) {
+            // retaining backward compatibility
+            this.runCondition = new LegacyBuildstepCondition(condition, invertCondition);
+        }
+        return this;
+    }
 
-	@Extension
-	public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+    @Override
+    public DescriptorImpl getDescriptor() {
+        return (DescriptorImpl) super.getDescriptor();
+    }
 
-		public boolean isApplicable(final Class<? extends AbstractProject> aClass) {
-			// @TODO enable for matrix builds - requires aggregation
-			// return FreeStyleProject.class.equals(aClass);
-			return !MatrixProject.class.equals(aClass) && !SingleConditionalBuilder.PROMOTION_JOB_TYPE.equals(aClass.getCanonicalName());
-		}
+    @Extension
+    public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
-		/**
-		 * This human readable name is used in the configuration screen.
-		 */
-		public String getDisplayName() {
-			return Messages.multistepbuilder_displayName();
-		}
+        public boolean isApplicable(final Class<? extends AbstractProject> aClass) {
+            return !SingleConditionalBuilder.PROMOTION_JOB_TYPE.equals(aClass.getCanonicalName());
+        }
 
-		@Override
-		public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
-			save();
-			return super.configure(req, formData);
-		}
+        /**
+         * This human readable name is used in the configuration screen.
+         */
+        public String getDisplayName() {
+            return Messages.multistepbuilder_displayName();
+        }
 
-		@Override
-		public Builder newInstance(StaplerRequest req, JSONObject formData) throws hudson.model.Descriptor.FormException {
-			ConditionalBuilder instance = req.bindJSON(ConditionalBuilder.class, formData);
-			instance.conditionalbuilders = Descriptor.newInstancesFromHeteroList(req, formData, "conditionalbuilders", Builder.all());
-			return instance;
-		}
+        @Override
+        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+            save();
+            return super.configure(req, formData);
+        }
 
-		public List<? extends Descriptor<? extends BuildStep>> getBuilderDescriptors(AbstractProject<?, ?> project) {
-			final SingleConditionalBuilderDescriptor singleConditionalStepDescriptor = Hudson.getInstance().getDescriptorByType(
-					SingleConditionalBuilderDescriptor.class);
-			return singleConditionalStepDescriptor.getAllowedBuilders(project);
-		}
+        @Override
+        public Builder newInstance(StaplerRequest req, JSONObject formData) throws hudson.model.Descriptor.FormException {
+            ConditionalBuilder instance = req.bindJSON(ConditionalBuilder.class, formData);
+            instance.conditionalbuilders = Descriptor.newInstancesFromHeteroList(req, formData, "conditionalbuilders", Builder.all());
+            return instance;
+        }
 
-		public DescriptorExtensionList<BuildStepRunner, BuildStepRunner.BuildStepRunnerDescriptor> getBuildStepRunners() {
-			return BuildStepRunner.all();
-		}
+        public List<? extends Descriptor<? extends BuildStep>> getBuilderDescriptors(AbstractProject<?, ?> project) {
+            final SingleConditionalBuilderDescriptor singleConditionalStepDescriptor = Hudson.getInstance().getDescriptorByType(
+                    SingleConditionalBuilderDescriptor.class);
+            return singleConditionalStepDescriptor.getAllowedBuilders(project);
+        }
 
-		public List<? extends Descriptor<? extends RunCondition>> getRunConditions() {
-			return RunCondition.all();
-		}
+        public DescriptorExtensionList<BuildStepRunner, BuildStepRunner.BuildStepRunnerDescriptor> getBuildStepRunners() {
+            return BuildStepRunner.all();
+        }
 
-	}
+        public List<? extends Descriptor<? extends RunCondition>> getRunConditions() {
+            return RunCondition.all();
+        }
+
+    }
 
 }

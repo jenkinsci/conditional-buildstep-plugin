@@ -21,81 +21,66 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.jenkinsci.plugins.conditionalbuildstep;
+package org.jenkinsci.plugins.conditionalbuildstep.matrix;
 
-import hudson.Extension;
 import hudson.Launcher;
-import hudson.matrix.MatrixAggregatable;
 import hudson.matrix.MatrixAggregator;
+import hudson.matrix.MatrixRun;
 import hudson.matrix.MatrixBuild;
 import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.tasks.BuildStep;
-import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.Builder;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A builder not directly configurable via UI, instances are only created for transitive usage to wrap the execution of multiple builders.
+ * An aggregator chaining all the aggregators of the chained builders - only done/used within a matrix build.
  * 
  * @author Dominik Bartholdi (imod)
  * 
  */
-public class BuilderChain extends Builder {
+public class MatrixAggregatorChain extends MatrixAggregator {
 
-    private final List<Builder> conditionalbuilders;
+    private List<MatrixAggregator> aggregators;
 
-    public BuilderChain(final List<Builder> conditionalbuilders) {
-        this.conditionalbuilders = conditionalbuilders;
+    public MatrixAggregatorChain(List<MatrixAggregator> aggregators, MatrixBuild build, Launcher launcher, BuildListener listener) {
+        super(build, launcher, listener);
+        this.aggregators = aggregators;
     }
 
     @Override
-    public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
+    public boolean startBuild() throws InterruptedException, IOException {
         boolean shouldContinue = true;
-        for (BuildStep buildStep : conditionalbuilders) {
+        for (MatrixAggregator aggregator : aggregators) {
             if (!shouldContinue) {
                 break;
             }
-            shouldContinue = buildStep.prebuild(build, listener);
+            shouldContinue = aggregator.startBuild();
         }
         return shouldContinue;
     }
 
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+    public boolean endBuild() throws InterruptedException, IOException {
         boolean shouldContinue = true;
-        for (BuildStep buildStep : conditionalbuilders) {
+        for (MatrixAggregator aggregator : aggregators) {
             if (!shouldContinue) {
                 break;
             }
-            shouldContinue = buildStep.perform(build, launcher, listener);
+            shouldContinue = aggregator.endBuild();
         }
         return shouldContinue;
     }
 
     @Override
-    public DescriptorImpl getDescriptor() {
-        return (DescriptorImpl) super.getDescriptor();
-    }
-
-    @Extension
-    public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
-
-        @SuppressWarnings("rawtypes")
-        @Override
-        public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-            return false;
+    public boolean endRun(MatrixRun run) throws InterruptedException, IOException {
+        boolean shouldContinue = true;
+        for (MatrixAggregator aggregator : aggregators) {
+            if (!shouldContinue) {
+                break;
+            }
+            shouldContinue = aggregator.endRun(run);
         }
-
-        @Override
-        public String getDisplayName() {
-            return "BuilderChain";
-        }
-
+        return shouldContinue;
     }
 
 }

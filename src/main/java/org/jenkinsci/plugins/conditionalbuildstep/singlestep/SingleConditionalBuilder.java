@@ -27,7 +27,9 @@ package org.jenkinsci.plugins.conditionalbuildstep.singlestep;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.matrix.MatrixProject;
+import hudson.matrix.MatrixAggregatable;
+import hudson.matrix.MatrixAggregator;
+import hudson.matrix.MatrixBuild;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -50,128 +52,145 @@ import org.jenkins_ci.plugins.run_condition.core.AlwaysRun;
 import org.jenkinsci.plugins.conditionalbuildstep.Messages;
 import org.jenkinsci.plugins.conditionalbuildstep.lister.BuilderDescriptorLister;
 import org.jenkinsci.plugins.conditionalbuildstep.lister.DefaultBuilderDescriptorLister;
+import org.jenkinsci.plugins.conditionalbuildstep.matrix.DummyMatrixAggregator;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 
-public class SingleConditionalBuilder extends Builder {
+/**
+ * 
+ * @author Anthony Robinson
+ * @author Dominik Bartholdi (imod)
+ */
+public class SingleConditionalBuilder extends Builder implements MatrixAggregatable {
 
-	public static final String PROMOTION_JOB_TYPE = "hudson.plugins.promoted_builds.PromotionProcess";
+    public static final String PROMOTION_JOB_TYPE = "hudson.plugins.promoted_builds.PromotionProcess";
 
-	private final RunCondition condition;
-	private final BuildStep buildStep;
-	private final BuildStepRunner runner;
+    private final RunCondition condition;
+    private final BuildStep buildStep;
+    private final BuildStepRunner runner;
 
-	@DataBoundConstructor
-	public SingleConditionalBuilder(final BuildStep buildStep, final RunCondition condition, final BuildStepRunner runner) {
-		this.buildStep = buildStep;
-		this.condition = condition;
-		this.runner = runner;
-	}
+    @DataBoundConstructor
+    public SingleConditionalBuilder(final BuildStep buildStep, final RunCondition condition, final BuildStepRunner runner) {
+        this.buildStep = buildStep;
+        this.condition = condition;
+        this.runner = runner;
+    }
 
-	public BuildStep getBuildStep() {
-		return buildStep;
-	}
+    public BuildStep getBuildStep() {
+        return buildStep;
+    }
 
-	public RunCondition getCondition() {
-		return condition;
-	}
+    public RunCondition getCondition() {
+        return condition;
+    }
 
-	public BuildStepRunner getRunner() {
-		return runner;
-	}
+    public BuildStepRunner getRunner() {
+        return runner;
+    }
 
-	public BuildStepMonitor getRequiredMonitorService() {
-		return BuildStepMonitor.BUILD;
-	}
+    public BuildStepMonitor getRequiredMonitorService() {
+        return BuildStepMonitor.BUILD;
+    }
 
-	@Override
-	public Collection getProjectActions(final AbstractProject<?, ?> project) {
-		return buildStep.getProjectActions(project);
-	}
+    @Override
+    public Collection getProjectActions(final AbstractProject<?, ?> project) {
+        return buildStep.getProjectActions(project);
+    }
 
-	@Override
-	public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
-		return runner.prebuild(condition, buildStep, build, listener);
-	}
+    @Override
+    public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
+        return runner.prebuild(condition, buildStep, build, listener);
+    }
 
-	@Override
-	public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
-		return runner.perform(condition, buildStep, build, launcher, listener);
-	}
+    @Override
+    public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
+        return runner.perform(condition, buildStep, build, launcher, listener);
+    }
 
-	@Extension(ordinal = Integer.MAX_VALUE - 500)
-	public static class SingleConditionalBuilderDescriptor extends BuildStepDescriptor<Builder> {
+    public MatrixAggregator createAggregator(MatrixBuild build, Launcher launcher, BuildListener listener) {
 
-		public static DescriptorExtensionList<BuilderDescriptorLister, Descriptor<BuilderDescriptorLister>> getAllBuilderDescriptorListers() {
-			return Hudson.getInstance().<BuilderDescriptorLister, Descriptor<BuilderDescriptorLister>> getDescriptorList(BuilderDescriptorLister.class);
-		}
+        // FIXME get the runCondition to tell whether we have to run it or not
+        if (true) {
+            return new DummyMatrixAggregator(build, launcher, listener);
+        }
 
-		private BuilderDescriptorLister builderLister;
+        if (buildStep instanceof MatrixAggregatable) {
+            return ((MatrixAggregatable) buildStep).createAggregator(build, launcher, listener);
+        }
+        return new DummyMatrixAggregator(build, launcher, listener);
+    }
 
-		@DataBoundConstructor
-		public SingleConditionalBuilderDescriptor(final BuilderDescriptorLister builderLister) {
-			this.builderLister = builderLister;
-		}
+    @Extension(ordinal = Integer.MAX_VALUE - 500)
+    public static class SingleConditionalBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
-		public SingleConditionalBuilderDescriptor() {
-			load();
-			if (builderLister == null)
-				builderLister = new DefaultBuilderDescriptorLister();
-		}
+        public static DescriptorExtensionList<BuilderDescriptorLister, Descriptor<BuilderDescriptorLister>> getAllBuilderDescriptorListers() {
+            return Hudson.getInstance().<BuilderDescriptorLister, Descriptor<BuilderDescriptorLister>> getDescriptorList(BuilderDescriptorLister.class);
+        }
 
-		public BuilderDescriptorLister getBuilderLister() {
-			return builderLister;
-		}
+        private BuilderDescriptorLister builderLister;
 
-		@Override
-		public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
-			final SingleConditionalBuilderDescriptor newConfig = req.bindJSON(SingleConditionalBuilderDescriptor.class, json);
-			if (newConfig.builderLister != null)
-				builderLister = newConfig.builderLister;
-			save();
-			return true;
-		}
+        @DataBoundConstructor
+        public SingleConditionalBuilderDescriptor(final BuilderDescriptorLister builderLister) {
+            this.builderLister = builderLister;
+        }
 
-		@Override
-		public String getDisplayName() {
-			return Messages.singlestepbuilder_displayName();
-		}
+        public SingleConditionalBuilderDescriptor() {
+            load();
+            if (builderLister == null)
+                builderLister = new DefaultBuilderDescriptorLister();
+        }
 
-		public boolean isApplicable(final Class<? extends AbstractProject> aClass) {
-			// @TODO enable for matrix builds - requires aggregation
-			// return FreeStyleProject.class.equals(aClass);
-			return !MatrixProject.class.equals(aClass) && !PROMOTION_JOB_TYPE.equals(aClass.getCanonicalName());
-		}
+        public BuilderDescriptorLister getBuilderLister() {
+            return builderLister;
+        }
 
-		public DescriptorExtensionList<BuildStepRunner, BuildStepRunner.BuildStepRunnerDescriptor> getBuildStepRunners() {
-			return BuildStepRunner.all();
-		}
+        @Override
+        public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+            final SingleConditionalBuilderDescriptor newConfig = req.bindJSON(SingleConditionalBuilderDescriptor.class, json);
+            if (newConfig.builderLister != null)
+                builderLister = newConfig.builderLister;
+            save();
+            return true;
+        }
 
-		public BuildStepRunner.BuildStepRunnerDescriptor getDefaultBuildStepRunner() {
-			return Hudson.getInstance().getDescriptorByType(BuildStepRunner.Fail.FailDescriptor.class);
-		}
+        @Override
+        public String getDisplayName() {
+            return Messages.singlestepbuilder_displayName();
+        }
 
-		public List<? extends Descriptor<? extends RunCondition>> getRunConditions() {
-			return RunCondition.all();
-		}
+        public boolean isApplicable(final Class<? extends AbstractProject> aClass) {
+            return !PROMOTION_JOB_TYPE.equals(aClass.getCanonicalName());
+        }
 
-		public RunCondition.RunConditionDescriptor getDefaultRunCondition() {
-			return Hudson.getInstance().getDescriptorByType(AlwaysRun.AlwaysRunDescriptor.class);
-		}
+        public DescriptorExtensionList<BuildStepRunner, BuildStepRunner.BuildStepRunnerDescriptor> getBuildStepRunners() {
+            return BuildStepRunner.all();
+        }
 
-		public List<? extends Descriptor<? extends BuildStep>> getAllowedBuilders(AbstractProject<?, ?> project) {
-			if (project == null)
-				project = Stapler.getCurrentRequest().findAncestorObject(AbstractProject.class);
-			return builderLister.getAllowedBuilders(project);
-		}
+        public BuildStepRunner.BuildStepRunnerDescriptor getDefaultBuildStepRunner() {
+            return Hudson.getInstance().getDescriptorByType(BuildStepRunner.Fail.FailDescriptor.class);
+        }
 
-		public Object readResolve() {
-			if (builderLister == null)
-				builderLister = new DefaultBuilderDescriptorLister();
-			return this;
-		}
+        public List<? extends Descriptor<? extends RunCondition>> getRunConditions() {
+            return RunCondition.all();
+        }
 
-	}
+        public RunCondition.RunConditionDescriptor getDefaultRunCondition() {
+            return Hudson.getInstance().getDescriptorByType(AlwaysRun.AlwaysRunDescriptor.class);
+        }
+
+        public List<? extends Descriptor<? extends BuildStep>> getAllowedBuilders(AbstractProject<?, ?> project) {
+            if (project == null)
+                project = Stapler.getCurrentRequest().findAncestorObject(AbstractProject.class);
+            return builderLister.getAllowedBuilders(project);
+        }
+
+        public Object readResolve() {
+            if (builderLister == null)
+                builderLister = new DefaultBuilderDescriptorLister();
+            return this;
+        }
+
+    }
 
 }
