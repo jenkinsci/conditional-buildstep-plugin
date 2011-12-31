@@ -27,9 +27,6 @@ package org.jenkinsci.plugins.conditionalbuildstep.singlestep;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.matrix.MatrixAggregatable;
-import hudson.matrix.MatrixAggregator;
-import hudson.matrix.MatrixBuild;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -52,7 +49,6 @@ import org.jenkins_ci.plugins.run_condition.core.AlwaysRun;
 import org.jenkinsci.plugins.conditionalbuildstep.Messages;
 import org.jenkinsci.plugins.conditionalbuildstep.lister.BuilderDescriptorLister;
 import org.jenkinsci.plugins.conditionalbuildstep.lister.DefaultBuilderDescriptorLister;
-import org.jenkinsci.plugins.conditionalbuildstep.matrix.DummyMatrixAggregator;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
@@ -62,7 +58,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Anthony Robinson
  * @author Dominik Bartholdi (imod)
  */
-public class SingleConditionalBuilder extends Builder implements MatrixAggregatable {
+public class SingleConditionalBuilder extends Builder {
 
     public static final String PROMOTION_JOB_TYPE = "hudson.plugins.promoted_builds.PromotionProcess";
 
@@ -108,19 +104,6 @@ public class SingleConditionalBuilder extends Builder implements MatrixAggregata
         return runner.perform(condition, buildStep, build, launcher, listener);
     }
 
-    public MatrixAggregator createAggregator(MatrixBuild build, Launcher launcher, BuildListener listener) {
-
-        // FIXME get the runCondition to tell whether we have to run it or not
-        if (true) {
-            return new DummyMatrixAggregator(build, launcher, listener);
-        }
-
-        if (buildStep instanceof MatrixAggregatable) {
-            return ((MatrixAggregatable) buildStep).createAggregator(build, launcher, listener);
-        }
-        return new DummyMatrixAggregator(build, launcher, listener);
-    }
-
     @Extension(ordinal = Integer.MAX_VALUE - 500)
     public static class SingleConditionalBuilderDescriptor extends BuildStepDescriptor<Builder> {
 
@@ -160,6 +143,8 @@ public class SingleConditionalBuilder extends Builder implements MatrixAggregata
         }
 
         public boolean isApplicable(final Class<? extends AbstractProject> aClass) {
+            // No need for aggregation for matrix build with MatrixAggregatable
+            // this is only supported for: {@link Publisher}, {@link JobProperty}, {@link BuildWrapper}
             return !PROMOTION_JOB_TYPE.equals(aClass.getCanonicalName());
         }
 

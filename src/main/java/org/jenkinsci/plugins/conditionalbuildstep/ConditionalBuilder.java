@@ -26,9 +26,6 @@ package org.jenkinsci.plugins.conditionalbuildstep;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.matrix.MatrixAggregatable;
-import hudson.matrix.MatrixAggregator;
-import hudson.matrix.MatrixBuild;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -47,8 +44,6 @@ import net.sf.json.JSONObject;
 
 import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
-import org.jenkinsci.plugins.conditionalbuildstep.matrix.DummyMatrixAggregator;
-import org.jenkinsci.plugins.conditionalbuildstep.matrix.MatrixAggregatorChain;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder.SingleConditionalBuilderDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -59,7 +54,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * 
  * @author Dominik Bartholdi (imod)
  */
-public class ConditionalBuilder extends Builder implements MatrixAggregatable {
+public class ConditionalBuilder extends Builder {
     private static Logger log = Logger.getLogger(ConditionalBuilder.class.getName());
 
     // retaining backward compatibility
@@ -102,26 +97,6 @@ public class ConditionalBuilder extends Builder implements MatrixAggregatable {
         return runner.perform(runCondition, new BuilderChain(conditionalbuilders), build, launcher, listener);
     }
 
-    /**
-     * @see MatrixAggregatable#createAggregator(MatrixBuild, Launcher, BuildListener)
-     */
-    public MatrixAggregator createAggregator(MatrixBuild build, Launcher launcher, BuildListener listener) {
-        // FIXME get the runCondition to tell whether we have to run it or not
-        if (true) {
-            return new DummyMatrixAggregator(build, launcher, listener);
-        }
-        List<MatrixAggregator> aggregators = new ArrayList<MatrixAggregator>();
-        for (BuildStep buildStep : conditionalbuilders) {
-            if (buildStep instanceof MatrixAggregatable) {
-                final MatrixAggregator aggregator = ((MatrixAggregatable) buildStep).createAggregator(build, launcher, listener);
-                if (aggregator != null) {
-                    aggregators.add(aggregator);
-                }
-            }
-        }
-        return new MatrixAggregatorChain(aggregators, build, launcher, listener);
-    }
-
     public Object readResolve() {
         if (condition != null) {
             // retaining backward compatibility
@@ -139,6 +114,8 @@ public class ConditionalBuilder extends Builder implements MatrixAggregatable {
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
         public boolean isApplicable(final Class<? extends AbstractProject> aClass) {
+            // No need for aggregation for matrix build with MatrixAggregatable
+            // this is only supported for: {@link Publisher}, {@link JobProperty}, {@link BuildWrapper}
             return !SingleConditionalBuilder.PROMOTION_JOB_TYPE.equals(aClass.getCanonicalName());
         }
 
