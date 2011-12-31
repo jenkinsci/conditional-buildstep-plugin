@@ -51,8 +51,8 @@ public class DefaultBuilderDescriptorLister implements BuilderDescriptorLister {
 		final List<BuildStepDescriptor<? extends Builder>> builders = new ArrayList<BuildStepDescriptor<? extends Builder>>();
 		if (project == null)
 			return builders;
-		for (Descriptor descriptor : Builder.all()) {
-			if (descriptor instanceof SingleConditionalBuilder.SingleConditionalBuilderDescriptor) {
+        for (Descriptor<Builder> descriptor : Builder.all()) {
+            if (descriptor instanceof SingleConditionalBuilder.SingleConditionalBuilderDescriptor) {
 				continue;
 			}
 			if (descriptor instanceof ConditionalBuilder.DescriptorImpl) {
