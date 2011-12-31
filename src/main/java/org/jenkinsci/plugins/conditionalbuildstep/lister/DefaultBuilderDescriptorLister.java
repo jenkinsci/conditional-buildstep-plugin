@@ -36,6 +36,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jenkinsci.plugins.conditionalbuildstep.BuilderChain;
 import org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder;
 import org.jenkinsci.plugins.conditionalbuildstep.Messages;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
@@ -58,6 +59,9 @@ public class DefaultBuilderDescriptorLister implements BuilderDescriptorLister {
 			if (descriptor instanceof ConditionalBuilder.DescriptorImpl) {
 				continue;
 			}
+			if (descriptor instanceof BuilderChain.DescriptorImpl) {
+                continue;
+            }
 			if (!(descriptor instanceof BuildStepDescriptor)) {
 				continue;
 			}
