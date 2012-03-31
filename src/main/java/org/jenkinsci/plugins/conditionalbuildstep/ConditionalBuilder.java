@@ -34,6 +34,7 @@ import hudson.model.Hudson;
 import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
+import hudson.tasks.Publisher;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -135,7 +136,12 @@ public class ConditionalBuilder extends Builder {
         @Override
         public Builder newInstance(StaplerRequest req, JSONObject formData) throws hudson.model.Descriptor.FormException {
             ConditionalBuilder instance = req.bindJSON(ConditionalBuilder.class, formData);
-            instance.conditionalbuilders = Descriptor.newInstancesFromHeteroList(req, formData, "conditionalbuilders", Builder.all());
+            if (formData.opt("conditionalbuilders") != null) {
+                final List all = new ArrayList(Builder.all());
+                // as Any Build step also allows publishers to be used, we have to pass the publisher descriptors too...
+                all.addAll(Publisher.all());
+                instance.conditionalbuilders = Descriptor.newInstancesFromHeteroList(req, formData, "conditionalbuilders", all);
+            }
             return instance;
         }
 
