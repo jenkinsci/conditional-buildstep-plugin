@@ -52,8 +52,9 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * A buildstep wrapping any number of other buildsteps, controlling there execution based on a defined condition.
- * 
+ *
  * @author Dominik Bartholdi (imod)
+ * @author Chris Johnson (cjo9900)
  */
 public class ConditionalBuilder extends Builder {
     private static Logger log = Logger.getLogger(ConditionalBuilder.class.getName());
@@ -64,14 +65,24 @@ public class ConditionalBuilder extends Builder {
 
     private final BuildStepRunner runner;
     private RunCondition runCondition;
-    private List<Builder> conditionalbuilders = new ArrayList<Builder>();
+    private List<Builder> conditionalbuilders;
 
-    @DataBoundConstructor
+    /**
+     * @deprecated  No longer needed as part of the Constructor
+     *  Use {@link #ConditionalBuilder(RunCondition, BuildStepRunner, List<Builder>)}
+    */
+    @Deprecated
     public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner) {
-        this.runner = runner;
-        this.runCondition = runCondition;
+        //List<Builder> builders = new ArrayList<Builder>();
+        this(runCondition, runner, new ArrayList<Builder>());
     }
 
+    @DataBoundConstructor
+    public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner, List<Builder> conditionalbuilders) {
+        this.runner = runner;
+        this.runCondition = runCondition;
+        this.conditionalbuilders = conditionalbuilders;
+    }
     public BuildStepRunner getRunner() {
         return runner;
     }
@@ -84,6 +95,12 @@ public class ConditionalBuilder extends Builder {
         return conditionalbuilders;
     }
 
+    /**
+     * Set the Conditional Builders
+     *
+     * @deprecated  No longer needed as part of the DataBoundConstructor
+     */
+    @Deprecated
     public void setConditionalbuilders(List<Builder> conditionalbuilders) {
         this.conditionalbuilders = conditionalbuilders;
     }
@@ -131,18 +148,6 @@ public class ConditionalBuilder extends Builder {
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             save();
             return super.configure(req, formData);
-        }
-
-        @Override
-        public Builder newInstance(StaplerRequest req, JSONObject formData) throws hudson.model.Descriptor.FormException {
-            ConditionalBuilder instance = req.bindJSON(ConditionalBuilder.class, formData);
-            if (formData.opt("conditionalbuilders") != null) {
-                final List all = new ArrayList(Builder.all());
-                // as Any Build step also allows publishers to be used, we have to pass the publisher descriptors too...
-                all.addAll(Publisher.all());
-                instance.conditionalbuilders = Descriptor.newInstancesFromHeteroList(req, formData, "conditionalbuilders", all);
-            }
-            return instance;
         }
 
         public List<? extends Descriptor<? extends BuildStep>> getBuilderDescriptors(AbstractProject<?, ?> project) {
