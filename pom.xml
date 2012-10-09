@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>1.408</version>
+		<version>1.420</version>
 		<!-- <version>1.424.6</version> -->
 		<!-- <version>1.460</version> e.g. https://issues.jenkins-ci.org/browse/JENKINS-13469 -->
 	</parent>
@@ -116,9 +116,9 @@
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>org.codehaus.groovy.maven</groupId>
+										<groupId>org.codehaus.gmaven</groupId>
 										<artifactId>gmaven-plugin</artifactId>
-										<versionRange>[0.1,)</versionRange>
+										<versionRange>[1.0,)</versionRange>
 										<goals>
 											<goal>generateTestStubs</goal>
 											<goal>testCompile</goal>
