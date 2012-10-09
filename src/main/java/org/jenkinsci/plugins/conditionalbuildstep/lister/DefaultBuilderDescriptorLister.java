@@ -25,6 +25,7 @@
 package org.jenkinsci.plugins.conditionalbuildstep.lister;
 
 import hudson.Extension;
+import hudson.Functions;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
@@ -49,10 +50,11 @@ public class DefaultBuilderDescriptorLister implements BuilderDescriptorLister {
 	}
 
 	public List<? extends Descriptor<? extends BuildStep>> getAllowedBuilders(final AbstractProject<?, ?> project) {
-		final List<BuildStepDescriptor<? extends Builder>> builders = new ArrayList<BuildStepDescriptor<? extends Builder>>();
+		final List<Descriptor<? extends Builder>> builders = new ArrayList<Descriptor<? extends Builder>>();
 		if (project == null)
 			return builders;
-        for (Descriptor<Builder> descriptor : Builder.all()) {
+
+        for (Descriptor<Builder> descriptor : Functions.getBuilderDescriptors(project)) {
             if (descriptor instanceof SingleConditionalBuilder.SingleConditionalBuilderDescriptor) {
 				continue;
 			}
@@ -62,26 +64,13 @@ public class DefaultBuilderDescriptorLister implements BuilderDescriptorLister {
 			if (descriptor instanceof BuilderChain.DescriptorImpl) {
                 continue;
             }
-			if (!(descriptor instanceof BuildStepDescriptor)) {
-				continue;
-			}
-			BuildStepDescriptor<? extends Builder> buildStepDescriptor = (BuildStepDescriptor) descriptor;
-			if (buildStepDescriptor.isApplicable(project.getClass()) && hasDbc(buildStepDescriptor.clazz))
-				builders.add(buildStepDescriptor);
+        	builders.add(descriptor);
 		}
 		return builders;
 	}
 
 	public DescriptorImpl getDescriptor() {
 		return Hudson.getInstance().getDescriptorByType(DescriptorImpl.class);
-	}
-
-	private boolean hasDbc(final Class<?> clazz) {
-		for (Constructor<?> constructor : clazz.getConstructors()) {
-			if (constructor.isAnnotationPresent(DataBoundConstructor.class))
-				return true;
-		}
-		return false;
 	}
 
 	@Extension
