@@ -25,7 +25,6 @@
 package org.jenkinsci.plugins.conditionalbuildstep.lister;
 
 import hudson.Extension;
-import hudson.Functions;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
@@ -45,42 +44,54 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 public class DefaultBuilderDescriptorLister implements BuilderDescriptorLister {
 
-	@DataBoundConstructor
-	public DefaultBuilderDescriptorLister() {
-	}
+    @DataBoundConstructor
+    public DefaultBuilderDescriptorLister() {
+    }
 
-	public List<? extends Descriptor<? extends BuildStep>> getAllowedBuilders(final AbstractProject<?, ?> project) {
-		final List<Descriptor<? extends Builder>> builders = new ArrayList<Descriptor<? extends Builder>>();
-		if (project == null)
-			return builders;
-
-        for (Descriptor<Builder> descriptor : Functions.getBuilderDescriptors(project)) {
+    public List<? extends Descriptor<? extends BuildStep>> getAllowedBuilders(final AbstractProject<?, ?> project) {
+        final List<BuildStepDescriptor<? extends Builder>> builders = new ArrayList<BuildStepDescriptor<? extends Builder>>();
+        if (project == null)
+            return builders;
+        for (Descriptor<Builder> descriptor : Builder.all()) {
             if (descriptor instanceof SingleConditionalBuilder.SingleConditionalBuilderDescriptor) {
-				continue;
-			}
-			if (descriptor instanceof ConditionalBuilder.DescriptorImpl) {
-				continue;
-			}
-			if (descriptor instanceof BuilderChain.DescriptorImpl) {
                 continue;
             }
-        	builders.add(descriptor);
-		}
-		return builders;
-	}
+            if (descriptor instanceof ConditionalBuilder.DescriptorImpl) {
+                continue;
+            }
+            if (descriptor instanceof BuilderChain.DescriptorImpl) {
+                continue;
+            }
+            if (!(descriptor instanceof BuildStepDescriptor)) {
+                continue;
+            }
+            BuildStepDescriptor<? extends Builder> buildStepDescriptor = (BuildStepDescriptor) descriptor;
+            if (buildStepDescriptor.isApplicable(project.getClass()) && hasDbc(buildStepDescriptor.clazz))
+                builders.add(buildStepDescriptor);
+        }
+        return builders;
+    }
 
-	public DescriptorImpl getDescriptor() {
-		return Hudson.getInstance().getDescriptorByType(DescriptorImpl.class);
-	}
+    public DescriptorImpl getDescriptor() {
+        return Hudson.getInstance().getDescriptorByType(DescriptorImpl.class);
+    }
 
-	@Extension
-	public static class DescriptorImpl extends Descriptor<BuilderDescriptorLister> {
+    private boolean hasDbc(final Class<?> clazz) {
+        for (Constructor<?> constructor : clazz.getConstructors()) {
+            if (constructor.isAnnotationPresent(DataBoundConstructor.class))
+                return true;
+        }
+        return false;
+    }
 
-		@Override
-		public String getDisplayName() {
-			return Messages.defaultBuilderDescriptor_displayName();
-		}
+    @Extension
+    public static class DescriptorImpl extends Descriptor<BuilderDescriptorLister> {
 
-	}
+        @Override
+        public String getDisplayName() {
+            return Messages.defaultBuilderDescriptor_displayName();
+        }
+
+    }
 
 }
