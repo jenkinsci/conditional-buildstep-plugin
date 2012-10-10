@@ -28,9 +28,7 @@ import hudson.Launcher;
 import hudson.matrix.MatrixAggregatable;
 import hudson.matrix.MatrixAggregator;
 import hudson.matrix.MatrixBuild;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
+import hudson.model.*;
 import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -45,7 +43,7 @@ import java.util.List;
  * @author Dominik Bartholdi (imod)
  * 
  */
-public class BuilderChain extends Builder {
+public class BuilderChain extends Builder implements DependecyDeclarer {
 
     private final List<Builder> conditionalbuilders;
 
@@ -80,6 +78,15 @@ public class BuilderChain extends Builder {
     @Override
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl) super.getDescriptor();
+    }
+
+    public void buildDependencyGraph(AbstractProject owner, DependencyGraph graph) {
+        for (Object o : conditionalbuilders) {
+            if (o instanceof DependecyDeclarer) {
+                DependecyDeclarer dd = (DependecyDeclarer) o;
+                dd.buildDependencyGraph(owner,graph);
+            }
+        }
     }
 
     @Extension

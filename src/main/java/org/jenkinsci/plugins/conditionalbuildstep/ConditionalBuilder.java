@@ -26,11 +26,7 @@ package org.jenkinsci.plugins.conditionalbuildstep;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Descriptor;
-import hudson.model.Hudson;
+import hudson.model.*;
 import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
@@ -56,7 +52,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Dominik Bartholdi (imod)
  * @author Chris Johnson (cjo9900)
  */
-public class ConditionalBuilder extends Builder {
+public class ConditionalBuilder extends Builder implements DependecyDeclarer {
     private static Logger log = Logger.getLogger(ConditionalBuilder.class.getName());
 
     // retaining backward compatibility
@@ -126,6 +122,15 @@ public class ConditionalBuilder extends Builder {
     @Override
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl) super.getDescriptor();
+    }
+
+    public void buildDependencyGraph(AbstractProject owner, DependencyGraph graph) {
+        for (Object o : conditionalbuilders) {
+            if (o instanceof DependecyDeclarer) {
+                DependecyDeclarer dd = (DependecyDeclarer) o;
+                dd.buildDependencyGraph(owner,graph);
+            }
+        }
     }
 
     @Extension
