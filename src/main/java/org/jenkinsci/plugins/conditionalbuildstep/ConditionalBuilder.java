@@ -27,8 +27,10 @@ import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.BuildListener;
+import hudson.model.DependencyGraph;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.DependecyDeclarer;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.tasks.BuildStep;
@@ -56,7 +58,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Dominik Bartholdi (imod)
  * @author Chris Johnson (cjo9900)
  */
-public class ConditionalBuilder extends Builder {
+public class ConditionalBuilder extends Builder implements DependecyDeclarer {
     private static Logger log = Logger.getLogger(ConditionalBuilder.class.getName());
 
     // retaining backward compatibility
@@ -164,6 +166,14 @@ public class ConditionalBuilder extends Builder {
             return RunCondition.all();
         }
 
+    }
+
+    public void buildDependencyGraph(AbstractProject project, DependencyGraph graph) {
+        for (Builder builder : conditionalbuilders) {
+            if(builder instanceof DependecyDeclarer) {
+                ((DependecyDeclarer)builder).buildDependencyGraph(project, graph);
+            }
+        }
     }
 
 }

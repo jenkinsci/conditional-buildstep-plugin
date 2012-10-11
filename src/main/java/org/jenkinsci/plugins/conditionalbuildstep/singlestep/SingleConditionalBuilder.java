@@ -30,6 +30,8 @@ import hudson.Launcher;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.DependecyDeclarer;
+import hudson.model.DependencyGraph;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.tasks.BuildStep;
@@ -58,7 +60,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Anthony Robinson
  * @author Dominik Bartholdi (imod)
  */
-public class SingleConditionalBuilder extends Builder {
+public class SingleConditionalBuilder extends Builder implements DependecyDeclarer {
 
     public static final String PROMOTION_JOB_TYPE = "hudson.plugins.promoted_builds.PromotionProcess";
 
@@ -102,6 +104,12 @@ public class SingleConditionalBuilder extends Builder {
     @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
         return runner.perform(condition, buildStep, build, launcher, listener);
+    }
+    
+    public void buildDependencyGraph(AbstractProject project, DependencyGraph graph) {
+        if(buildStep instanceof DependecyDeclarer) {
+            ((DependecyDeclarer)buildStep).buildDependencyGraph(project, graph);
+        }
     }
 
     @Extension(ordinal = Integer.MAX_VALUE - 500)
