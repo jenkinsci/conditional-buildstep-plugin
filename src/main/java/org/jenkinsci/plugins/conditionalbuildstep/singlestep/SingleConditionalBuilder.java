@@ -88,7 +88,7 @@ public class SingleConditionalBuilder extends Builder implements DependecyDeclar
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
-        return BuildStepMonitor.BUILD;
+        return buildStep.getRequiredMonitorService();;
     }
 
     @Override
