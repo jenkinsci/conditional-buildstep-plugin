@@ -40,6 +40,7 @@ import hudson.tasks.Publisher;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -94,6 +95,9 @@ public class ConditionalBuilder extends Builder implements DependecyDeclarer {
     }
 
     public List<Builder> getConditionalbuilders() {
+        if(conditionalbuilders == null){
+            conditionalbuilders = new ArrayList<Builder>();
+        }
         return conditionalbuilders;
     }
 
@@ -109,12 +113,12 @@ public class ConditionalBuilder extends Builder implements DependecyDeclarer {
 
     @Override
     public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
-        return runner.prebuild(runCondition, new BuilderChain(conditionalbuilders), build, listener);
+        return runner.prebuild(runCondition, new BuilderChain(getConditionalbuilders()), build, listener);
     }
 
     @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
-        return runner.perform(runCondition, new BuilderChain(conditionalbuilders), build, launcher, listener);
+        return runner.perform(runCondition, new BuilderChain(getConditionalbuilders()), build, launcher, listener);
     }
 
     public Object readResolve() {
@@ -169,7 +173,7 @@ public class ConditionalBuilder extends Builder implements DependecyDeclarer {
     }
 
     public void buildDependencyGraph(AbstractProject project, DependencyGraph graph) {
-        for (Builder builder : conditionalbuilders) {
+        for (Builder builder : getConditionalbuilders()) {
             if(builder instanceof DependecyDeclarer) {
                 ((DependecyDeclarer)builder).buildDependencyGraph(project, graph);
             }
