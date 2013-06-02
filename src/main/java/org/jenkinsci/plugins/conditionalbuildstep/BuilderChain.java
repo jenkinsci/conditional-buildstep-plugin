@@ -25,9 +25,6 @@ package org.jenkinsci.plugins.conditionalbuildstep;
 
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.matrix.MatrixAggregatable;
-import hudson.matrix.MatrixAggregator;
-import hudson.matrix.MatrixBuild;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -36,7 +33,6 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

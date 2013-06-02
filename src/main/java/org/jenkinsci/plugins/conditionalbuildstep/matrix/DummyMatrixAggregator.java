@@ -2,8 +2,8 @@ package org.jenkinsci.plugins.conditionalbuildstep.matrix;
 
 import hudson.Launcher;
 import hudson.matrix.MatrixAggregator;
-import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixRun;
+import hudson.matrix.MatrixBuild;
 import hudson.model.BuildListener;
 
 import java.io.IOException;
