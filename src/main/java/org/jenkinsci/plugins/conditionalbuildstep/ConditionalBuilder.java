@@ -52,7 +52,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
- * A buildstep wrapping any number of other buildsteps, controlling there execution based on a defined condition.
+ * A buildstep wrapping any number of other buildsteps, controlling their execution based on a defined condition.
  *
  * @author Dominik Bartholdi (imod)
  * @author Chris Johnson (cjo9900)
