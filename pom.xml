@@ -12,7 +12,7 @@
 	</parent>
 
 	<artifactId>conditional-buildstep</artifactId>
-	<version>1.2.2</version>
+	<version>1.2.3-SNAPSHOT</version>
 
 	<packaging>hpi</packaging>
 
