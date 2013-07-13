@@ -27,6 +27,7 @@ package org.jenkinsci.plugins.conditionalbuildstep.singlestep;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.DependecyDeclarer;
 import hudson.model.DependencyGraph;
@@ -41,6 +42,7 @@ import hudson.tasks.Builder;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.json.JSONObject;
@@ -88,12 +90,12 @@ public class SingleConditionalBuilder extends Builder implements DependecyDeclar
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
-        return buildStep.getRequiredMonitorService();
+        return buildStep == null ? BuildStepMonitor.NONE : buildStep.getRequiredMonitorService();
     }
 
     @Override
     public Collection getProjectActions(final AbstractProject<?, ?> project) {
-        return buildStep.getProjectActions(project);
+        return buildStep == null ? Collections.emptyList() : buildStep.getProjectActions(project);
     }
 
     @Override
@@ -107,8 +109,10 @@ public class SingleConditionalBuilder extends Builder implements DependecyDeclar
     }
     
     public void buildDependencyGraph(AbstractProject project, DependencyGraph graph) {
-        if(buildStep instanceof DependecyDeclarer) {
-            ((DependecyDeclarer)buildStep).buildDependencyGraph(project, graph);
+        if(buildStep != null) {
+            if(buildStep instanceof DependecyDeclarer) {
+                ((DependecyDeclarer)buildStep).buildDependencyGraph(project, graph);
+            }
         }
     }
 
