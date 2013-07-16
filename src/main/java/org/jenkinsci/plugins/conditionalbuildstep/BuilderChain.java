@@ -43,9 +43,9 @@ import java.util.List;
  */
 public class BuilderChain extends Builder {
 
-    private final List<Builder> conditionalbuilders;
+    private final List<BuildStep> conditionalbuilders;
 
-    public BuilderChain(final List<Builder> conditionalbuilders) {
+    public BuilderChain(final List<BuildStep> conditionalbuilders) {
         this.conditionalbuilders = conditionalbuilders;
     }
 

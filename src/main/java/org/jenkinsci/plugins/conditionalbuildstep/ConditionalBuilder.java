@@ -66,7 +66,7 @@ public class ConditionalBuilder extends Builder implements DependecyDeclarer {
 
     private final BuildStepRunner runner;
     private RunCondition runCondition;
-    private List<Builder> conditionalbuilders;
+    private List<BuildStep> conditionalbuilders;
 
     /**
      * @deprecated  No longer needed as part of the Constructor
@@ -75,11 +75,11 @@ public class ConditionalBuilder extends Builder implements DependecyDeclarer {
     @Deprecated
     public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner) {
         //List<Builder> builders = new ArrayList<Builder>();
-        this(runCondition, runner, new ArrayList<Builder>());
+        this(runCondition, runner, new ArrayList<BuildStep>());
     }
 
     @DataBoundConstructor
-    public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner, List<Builder> conditionalbuilders) {
+    public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner, List<BuildStep> conditionalbuilders) {
         this.runner = runner;
         this.runCondition = runCondition;
         this.conditionalbuilders = conditionalbuilders;
@@ -92,9 +92,9 @@ public class ConditionalBuilder extends Builder implements DependecyDeclarer {
         return runCondition;
     }
 
-    public List<Builder> getConditionalbuilders() {
+    public List<BuildStep> getConditionalbuilders() {
         if(conditionalbuilders == null){
-            conditionalbuilders = new ArrayList<Builder>();
+            conditionalbuilders = new ArrayList<BuildStep>();
         }
         return conditionalbuilders;
     }
@@ -105,7 +105,7 @@ public class ConditionalBuilder extends Builder implements DependecyDeclarer {
      * @deprecated  No longer needed as part of the DataBoundConstructor
      */
     @Deprecated
-    public void setConditionalbuilders(List<Builder> conditionalbuilders) {
+    public void setConditionalbuilders(List<BuildStep> conditionalbuilders) {
         this.conditionalbuilders = conditionalbuilders;
     }
 
@@ -171,7 +171,7 @@ public class ConditionalBuilder extends Builder implements DependecyDeclarer {
     }
 
     public void buildDependencyGraph(AbstractProject project, DependencyGraph graph) {
-        for (Builder builder : getConditionalbuilders()) {
+        for (BuildStep builder : getConditionalbuilders()) {
             if(builder instanceof DependecyDeclarer) {
                 ((DependecyDeclarer)builder).buildDependencyGraph(project, graph);
             }

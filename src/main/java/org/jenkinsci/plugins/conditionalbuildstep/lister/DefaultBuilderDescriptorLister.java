@@ -66,8 +66,9 @@ public class DefaultBuilderDescriptorLister implements BuilderDescriptorLister {
                 continue;
             }
             BuildStepDescriptor<? extends Builder> buildStepDescriptor = (BuildStepDescriptor) descriptor;
-            if (buildStepDescriptor.isApplicable(project.getClass()) && hasDbc(buildStepDescriptor.clazz))
+            if (buildStepDescriptor.isApplicable(project.getClass()) && hasDbc(buildStepDescriptor.clazz)){
                 builders.add(buildStepDescriptor);
+            }
         }
         return builders;
     }
