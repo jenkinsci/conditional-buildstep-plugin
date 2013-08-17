@@ -26,6 +26,7 @@ package org.jenkinsci.plugins.conditionalbuildstep;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.DependecyDeclarer;
 import hudson.model.DependencyGraph;
@@ -39,6 +40,7 @@ import hudson.tasks.Builder;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -90,6 +92,18 @@ public class ConditionalBuilder extends Builder implements DependecyDeclarer {
 
     public RunCondition getRunCondition() {
         return runCondition;
+    }
+    
+    @Override
+    public Collection getProjectActions(AbstractProject<?, ?> project) {
+        final Collection projectActions = new ArrayList();
+        for (BuildStep buildStep : getConditionalbuilders()) {
+            Collection<? extends Action> pas = buildStep.getProjectActions(project);
+            if(pas != null) {
+                projectActions.addAll(pas);
+            }
+        }
+        return projectActions;
     }
 
     public List<BuildStep> getConditionalbuilders() {
