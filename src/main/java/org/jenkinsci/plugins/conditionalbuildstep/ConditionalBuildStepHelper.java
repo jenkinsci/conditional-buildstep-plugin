@@ -1,10 +1,14 @@
 package org.jenkinsci.plugins.conditionalbuildstep;
 
+import hudson.maven.MavenModuleSet;
+import hudson.model.AbstractProject;
 import hudson.model.Project;
 import hudson.tasks.BuildStep;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import jenkins.model.Jenkins;
 
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
 
@@ -28,11 +32,23 @@ public class ConditionalBuildStepHelper {
      *            the type of builders to search for
      * @return a list of all buildsteps, never <code>null</code>
      */
-    public static <T extends BuildStep> List<T> getContainedBuilders(Project<?, ?> p, Class<T> type) {
+    public static <T extends BuildStep> List<T> getContainedBuilders(AbstractProject<?, ?> ap, Class<T> type) {
+
+        final boolean mavenIsInstalled = isMavenPluginInstalled();
 
         List<T> r = new ArrayList<T>();
 
-        List<ConditionalBuilder> cbuilders = p.getBuildersList().getAll(ConditionalBuilder.class);
+        List<ConditionalBuilder> cbuilders = new ArrayList<ConditionalBuilder>();
+        List<SingleConditionalBuilder> scbuilders = new ArrayList<SingleConditionalBuilder>();
+        if (Project.class.isAssignableFrom(ap.getClass())) {
+            Project<?, ?> p = (Project<?, ?>) ap;
+            cbuilders.addAll(p.getBuildersList().getAll(ConditionalBuilder.class));
+            scbuilders.addAll(p.getBuildersList().getAll(SingleConditionalBuilder.class));
+        } else if (mavenIsInstalled) {
+            cbuilders.addAll(getConditionalBuildersFromMavenProject(ap));
+            scbuilders.addAll(getSingleConditionalBuildersFromMavenProject(ap));
+        }
+
         for (ConditionalBuilder conditionalBuilder : cbuilders) {
             final List<BuildStep> cbs = conditionalBuilder.getConditionalbuilders();
             if (cbs != null) {
@@ -44,8 +60,7 @@ public class ConditionalBuildStepHelper {
             }
         }
 
-        List<SingleConditionalBuilder> scb = p.getBuildersList().getAll(SingleConditionalBuilder.class);
-        for (SingleConditionalBuilder singleConditionalBuilder : scb) {
+        for (SingleConditionalBuilder singleConditionalBuilder : scbuilders) {
             BuildStep buildStep = singleConditionalBuilder.getBuildStep();
             if (buildStep != null && type.isInstance(buildStep)) {
                 r.add(type.cast(buildStep));
@@ -55,4 +70,33 @@ public class ConditionalBuildStepHelper {
         return r;
     }
 
+    private static List<ConditionalBuilder> getConditionalBuildersFromMavenProject(AbstractProject<?, ?> ap) {
+        List<ConditionalBuilder> r = new ArrayList<ConditionalBuilder>();
+        if (MavenModuleSet.class.isAssignableFrom(ap.getClass())) {
+            MavenModuleSet ms = (MavenModuleSet) ap;
+            r.addAll(ms.getPostbuilders().getAll(ConditionalBuilder.class));
+            r.addAll(ms.getPrebuilders().getAll(ConditionalBuilder.class));
+        }
+        return r;
+    }
+
+    private static List<SingleConditionalBuilder> getSingleConditionalBuildersFromMavenProject(AbstractProject<?, ?> ap) {
+        List<SingleConditionalBuilder> r = new ArrayList<SingleConditionalBuilder>();
+        if (MavenModuleSet.class.isAssignableFrom(ap.getClass())) {
+            MavenModuleSet ms = (MavenModuleSet) ap;
+            r.addAll(ms.getPostbuilders().getAll(SingleConditionalBuilder.class));
+            r.addAll(ms.getPrebuilders().getAll(SingleConditionalBuilder.class));
+        }
+        return r;
+    }
+
+    /**
+     * Is the maven plugin installed and active?
+     * 
+     * @return
+     */
+    public static boolean isMavenPluginInstalled() {
+        final hudson.Plugin plugin = Jenkins.getInstance().getPlugin("maven-plugin");
+        return plugin != null ? plugin.getWrapper().isActive() : false;
+    }
 }
