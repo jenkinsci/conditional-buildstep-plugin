@@ -32,7 +32,6 @@ import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +65,7 @@ public class DefaultBuilderDescriptorLister implements BuilderDescriptorLister {
                 continue;
             }
             BuildStepDescriptor<? extends Builder> buildStepDescriptor = (BuildStepDescriptor) descriptor;
-            if (buildStepDescriptor.isApplicable(project.getClass()) && hasDbc(buildStepDescriptor.clazz)){
+            if (buildStepDescriptor.isApplicable(project.getClass())){
                 builders.add(buildStepDescriptor);
             }
         }
@@ -75,14 +74,6 @@ public class DefaultBuilderDescriptorLister implements BuilderDescriptorLister {
 
     public DescriptorImpl getDescriptor() {
         return Hudson.getInstance().getDescriptorByType(DescriptorImpl.class);
-    }
-
-    private boolean hasDbc(final Class<?> clazz) {
-        for (Constructor<?> constructor : clazz.getConstructors()) {
-            if (constructor.isAnnotationPresent(DataBoundConstructor.class))
-                return true;
-        }
-        return false;
     }
 
     @Extension
