@@ -63,7 +63,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Anthony Robinson
  * @author Dominik Bartholdi (imod)
  */
-public class SingleConditionalBuilder extends Builder implements DependecyDeclarer {
+public class SingleConditionalBuilder extends Builder implements DependencyDeclarer {
 
     public static final String PROMOTION_JOB_TYPE = "hudson.plugins.promoted_builds.PromotionProcess";
 
