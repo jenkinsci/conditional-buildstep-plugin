@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import jenkins.model.DependencyDeclarer;
 import net.sf.json.JSONObject;
 
 import org.jenkins_ci.plugins.run_condition.RunCondition;
@@ -62,7 +63,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Anthony Robinson
  * @author Dominik Bartholdi (imod)
  */
-public class SingleConditionalBuilder extends Builder implements DependecyDeclarer {
+public class SingleConditionalBuilder extends Builder implements DependencyDeclarer {
 
     public static final String PROMOTION_JOB_TYPE = "hudson.plugins.promoted_builds.PromotionProcess";
 
@@ -110,8 +111,9 @@ public class SingleConditionalBuilder extends Builder implements DependecyDeclar
     
     public void buildDependencyGraph(AbstractProject project, DependencyGraph graph) {
         if(buildStep != null) {
-            if(buildStep instanceof DependecyDeclarer) {
-                ((DependecyDeclarer)buildStep).buildDependencyGraph(project, graph);
+            if(buildStep instanceof DependencyDeclarer) {
+                DependencyDeclarer dependencyDeclarer = (DependencyDeclarer) buildStep;
+                dependencyDeclarer.buildDependencyGraph(project, graph);
             }
         }
     }
