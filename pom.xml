@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>conditional-buildstep</artifactId>
-	<version>1.3.4</version>
+	<version>1.3.5-SNAPSHOT</version>
 
 	<packaging>hpi</packaging>
 
@@ -21,7 +21,7 @@
 		<connection>scm:git:git://github.com/jenkinsci/conditional-buildstep-plugin.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/jenkinsci/conditional-buildstep-plugin.git</developerConnection>
 		<url>https://github.com/jenkinsci/conditional-buildstep-plugin</url>
-	  <tag>conditional-buildstep-1.3.4</tag>
+	  <tag>HEAD</tag>
   </scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
