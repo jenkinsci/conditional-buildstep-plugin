@@ -48,6 +48,7 @@ import java.util.List;
 import jenkins.model.DependencyDeclarer;
 import net.sf.json.JSONObject;
 
+import org.jenkins_ci.plugins.flexible_publish.ConditionalDependencyGraphWrapper;
 import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
 import org.jenkins_ci.plugins.run_condition.core.AlwaysRun;
@@ -113,7 +114,7 @@ public class SingleConditionalBuilder extends Builder implements DependencyDecla
         if(buildStep != null) {
             if(buildStep instanceof DependencyDeclarer) {
                 DependencyDeclarer dependencyDeclarer = (DependencyDeclarer) buildStep;
-                dependencyDeclarer.buildDependencyGraph(project, graph);
+                dependencyDeclarer.buildDependencyGraph(project, new ConditionalDependencyGraphWrapper(graph, condition, runner));
             }
         }
     }

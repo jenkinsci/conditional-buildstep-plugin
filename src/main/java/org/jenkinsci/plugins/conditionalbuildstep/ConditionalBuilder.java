@@ -38,6 +38,8 @@ import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 
+import org.jenkins_ci.plugins.flexible_publish.ConditionalDependencyGraphWrapper;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -187,7 +189,8 @@ public class ConditionalBuilder extends Builder implements DependencyDeclarer {
     public void buildDependencyGraph(AbstractProject project, DependencyGraph graph) {
         for (BuildStep builder : getConditionalbuilders()) {
             if(builder instanceof DependencyDeclarer) {
-                ((DependencyDeclarer)builder).buildDependencyGraph(project, graph);
+                ((DependencyDeclarer)builder).buildDependencyGraph(
+                        project, new ConditionalDependencyGraphWrapper(graph, runCondition, runner));
             }
         }
     }
