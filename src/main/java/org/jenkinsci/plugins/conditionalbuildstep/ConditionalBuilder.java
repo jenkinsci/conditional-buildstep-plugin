@@ -38,8 +38,6 @@ import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 
-import org.jenkins_ci.plugins.flexible_publish.ConditionalDependencyGraphWrapper;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,6 +48,7 @@ import net.sf.json.JSONObject;
 
 import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
+import org.jenkinsci.plugins.conditionalbuildstep.dependency.ConditionalDependencyGraphWrapper;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder.SingleConditionalBuilderDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
