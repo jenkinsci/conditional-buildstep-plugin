@@ -21,7 +21,7 @@ public class ConfigFileBuildWrapperTest {
     @Test
     public void conditionalBuildersInMavenProjectMustBeResolvable() throws Exception {
 
-        final MavenModuleSet p = j.createMavenProject("mvn");
+        final MavenModuleSet p = j.createProject(MavenModuleSet.class, "mvn");
 
         ConditionalBuilder cBuilder = new ConditionalBuilder(new BooleanCondition("true"), new BuildStepRunner.Run());
         Shell shell = new Shell("ls");
