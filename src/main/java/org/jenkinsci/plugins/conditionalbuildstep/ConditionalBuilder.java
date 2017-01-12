@@ -28,7 +28,7 @@ import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.Action;
 import hudson.model.BuildListener;
-import hudson.model.DependecyDeclarer;
+import jenkins.model.DependencyDeclarer;
 import hudson.model.DependencyGraph;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -48,6 +48,7 @@ import net.sf.json.JSONObject;
 
 import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
+import org.jenkinsci.plugins.conditionalbuildstep.dependency.ConditionalDependencyGraphWrapper;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder.SingleConditionalBuilderDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -59,7 +60,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Dominik Bartholdi (imod)
  * @author Chris Johnson (cjo9900)
  */
-public class ConditionalBuilder extends Builder implements DependecyDeclarer {
+public class ConditionalBuilder extends Builder implements DependencyDeclarer {
     private static Logger log = Logger.getLogger(ConditionalBuilder.class.getName());
 
     // retaining backward compatibility
@@ -186,8 +187,9 @@ public class ConditionalBuilder extends Builder implements DependecyDeclarer {
 
     public void buildDependencyGraph(AbstractProject project, DependencyGraph graph) {
         for (BuildStep builder : getConditionalbuilders()) {
-            if(builder instanceof DependecyDeclarer) {
-                ((DependecyDeclarer)builder).buildDependencyGraph(project, graph);
+            if(builder instanceof DependencyDeclarer) {
+                ((DependencyDeclarer)builder).buildDependencyGraph(
+                        project, new ConditionalDependencyGraphWrapper(graph, runCondition, runner));
             }
         }
     }

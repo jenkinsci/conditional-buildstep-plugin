@@ -27,9 +27,7 @@ package org.jenkinsci.plugins.conditionalbuildstep.singlestep;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.model.Action;
 import hudson.model.BuildListener;
-import hudson.model.DependecyDeclarer;
 import hudson.model.DependencyGraph;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -52,6 +50,7 @@ import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
 import org.jenkins_ci.plugins.run_condition.core.AlwaysRun;
 import org.jenkinsci.plugins.conditionalbuildstep.Messages;
+import org.jenkinsci.plugins.conditionalbuildstep.dependency.ConditionalDependencyGraphWrapper;
 import org.jenkinsci.plugins.conditionalbuildstep.lister.BuilderDescriptorLister;
 import org.jenkinsci.plugins.conditionalbuildstep.lister.DefaultBuilderDescriptorLister;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -113,7 +112,7 @@ public class SingleConditionalBuilder extends Builder implements DependencyDecla
         if(buildStep != null) {
             if(buildStep instanceof DependencyDeclarer) {
                 DependencyDeclarer dependencyDeclarer = (DependencyDeclarer) buildStep;
-                dependencyDeclarer.buildDependencyGraph(project, graph);
+                dependencyDeclarer.buildDependencyGraph(project, new ConditionalDependencyGraphWrapper(graph, condition, runner));
             }
         }
     }
