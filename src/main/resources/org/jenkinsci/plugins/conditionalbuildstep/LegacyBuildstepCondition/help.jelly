@@ -1,3 +1,4 @@
+<?jelly escape-by-default='true'?>
 <div>
 	Used to retain backward compatibility... please use the 'Boolean condition'
     The resolved value has to be <code>true</code> or <code>false</code> (where everything else then <code>true</code> is handled as <code>false</code>, case ignored).<br />
