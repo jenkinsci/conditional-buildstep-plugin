@@ -111,7 +111,12 @@ public class ConditionalBuildStepHelper {
      * @return
      */
     public static boolean isMavenPluginInstalled() {
-        final hudson.Plugin plugin = Jenkins.getInstance().getPlugin("maven-plugin");
-        return plugin != null ? plugin.getWrapper().isActive() : false;
+        Jenkins j = Jenkins.getInstance();
+        if (j != null) {
+            final hudson.Plugin plugin = j.getPlugin("maven-plugin");
+            return plugin != null ? plugin.getWrapper().isActive() : false;
+        } else {
+            return false;
+        }
     }
 }
