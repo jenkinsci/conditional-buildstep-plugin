@@ -1,10 +1,13 @@
 package org.jenkinsci.plugins.conditionalbuildstep;
 
 import hudson.EnvVars;
+import hudson.Functions;
 import hudson.maven.MavenModuleSet;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
+import hudson.tasks.BatchFile;
+import hudson.tasks.CommandInterpreter;
 import hudson.tasks.Shell;
 
 import java.util.ArrayList;
@@ -32,11 +35,16 @@ public class ConfigFileBuildWrapperTest {
         p.setRunHeadless(true);
 
         ConditionalBuilder cBuilder = new ConditionalBuilder(new BooleanCondition("true"), new BuildStepRunner.Run());
-        Shell shell = new Shell("ls");
+        
+        CommandInterpreter shell;
+        if(!Functions.isWindows())
+        	shell = new Shell("ls");
+        else
+        	shell = new BatchFile("dir");
         cBuilder.getConditionalbuilders().add(shell);
         p.getPrebuilders().add(cBuilder);
 
-        final List<Shell> containedBuilders = ConditionalBuildStepHelper.getContainedBuilders(p, Shell.class);
+        final List<CommandInterpreter> containedBuilders = ConditionalBuildStepHelper.getContainedBuilders(p, CommandInterpreter.class);
         Assert.assertNotNull("no builders returned", containedBuilders);
         Assert.assertEquals("not correct nummber of builders returned", 1, containedBuilders.size());
     }
@@ -47,13 +55,22 @@ public class ConfigFileBuildWrapperTest {
         final FreeStyleProject p = j.createFreeStyleProject();
 
         ConditionalBuilder cBuilder = new ConditionalBuilder(new BooleanCondition("true"), new BuildStepRunner.Run());
-        Shell shell = new Shell("ls");
-        Shell shell2 = new Shell("ls");
+        CommandInterpreter shell;
+        CommandInterpreter shell2;
+        
+        if(!Functions.isWindows()) {
+        	shell = new Shell("ls");
+            shell2 = new Shell("ls");
+        }
+        else {
+        	shell = new BatchFile("dir");
+            shell2 = new BatchFile("dir");
+        }
         cBuilder.getConditionalbuilders().add(shell);
         cBuilder.getConditionalbuilders().add(shell2);
         p.getBuildersList().add(cBuilder);
 
-        final List<Shell> containedBuilders = ConditionalBuildStepHelper.getContainedBuilders(p, Shell.class);
+        final List<CommandInterpreter> containedBuilders = ConditionalBuildStepHelper.getContainedBuilders(p, CommandInterpreter.class);
         Assert.assertNotNull("no builders returned", containedBuilders);
         Assert.assertEquals("not correct nummber of builders returned", 2, containedBuilders.size());
     }
@@ -66,10 +83,18 @@ public class ConfigFileBuildWrapperTest {
         EnvVars envVars = prop.getEnvVars();
         j.jenkins.getGlobalNodeProperties().add(prop);
         
-        final String elseBlockString = "Inside Else Block";
+        final String elseBlockString = "";
         envVars.put("TEST", "false");
-        Shell ifShell = new Shell("echo \"Inside If Block\"");
-        Shell elseShell = new Shell("echo \""+elseBlockString+"\"");
+        CommandInterpreter ifShell;
+        CommandInterpreter elseShell;
+        if(!Functions.isWindows()) {
+        	ifShell = new Shell("echo \"Inside If Block\"");
+        	elseShell = new Shell("echo \""+elseBlockString+"\"");
+        }
+        else {
+        	ifShell = new BatchFile("echo \"Inside If Block\"");
+        	elseShell = new BatchFile("echo \""+elseBlockString+"\"");
+        }
         SingleConditionalBuilder scBuilder = new SingleConditionalBuilder(ifShell,new BooleanCondition("${TEST}"), new BuildStepRunner.Run(),null,true,elseShell);
         
         p.getBuildersList().add(scBuilder);
@@ -92,10 +117,23 @@ public class ConfigFileBuildWrapperTest {
         envVars.put("IFELSET1", "true");
         envVars.put("IFELSET2", "true");
         
-        Shell ifShell = new Shell("echo \"Inside If Block\"");
-        Shell ifElseShell1 = new Shell("echo \"Inside first If-Else Block\"");
-        Shell ifElseShell2 = new Shell("echo \"Inside second If-Else Block\"");
-        Shell elseShell = new Shell("echo \"Inside Else Block\"");
+        CommandInterpreter ifShell;
+        CommandInterpreter ifElseShell1;
+        CommandInterpreter ifElseShell2;
+        CommandInterpreter elseShell;
+        if(!Functions.isWindows()) {
+        	ifShell = new Shell("echo \"Inside If Block\"");
+            ifElseShell1 = new Shell("echo \"Inside first If-Else Block\"");
+            ifElseShell2 = new Shell("echo \"Inside second If-Else Block\"");
+            elseShell = new Shell("echo \"Inside Else Block\"");
+        }
+        else {
+        	ifShell = new BatchFile("echo \"Inside If Block\"");
+        	ifElseShell1 = new BatchFile("echo \"Inside first If-Else Block\"");
+            ifElseShell2 = new BatchFile("echo \"Inside second If-Else Block\"");
+        	elseShell = new BatchFile("echo \"Inside Else Block\"");
+        }
+        
         List<SingleIfElseBlock> ifElseList = new ArrayList<SingleIfElseBlock>();
         ifElseList.add(new SingleIfElseBlock(ifElseShell1, new BooleanCondition("${IFELSET1}")));
         ifElseList.add(new SingleIfElseBlock(ifElseShell2, new BooleanCondition("${IFELSET2}")));
