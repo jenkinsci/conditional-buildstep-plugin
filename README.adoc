@@ -1,0 +1,81 @@
+= Conditional BuildStep Plugin for Jenkins
+
+A buildstep wrapping any number of other buildsteps, controlling their
+execution based on a defined condition.
+
+[[ConditionalBuildStepPlugin-Info]]
+== Info
+
+This plugin requires the
+https://plugins.jenkins.io/token-macro/[TokenMacro Plugin] and the 
+https://plugins.jenkins.io/run-condition/[Run Condition Plugin] to be installed!
+
+* Ever wanted to have more control whether a step should be executed or
+not?
+* Want to reduce the number of jobs doing nearly the same thing?
+
+Add a conditional buildstep which acts as a container. It will allow you
+to define a condition controling the execution of the step(s).
+
+[[ConditionalBuildStepPlugin-Conditions]]
+== Conditions
+
+There are multiple conditions one can choose of, these are all defined
+by the
+https://plugins.jenkins.io/run-condition/[Run
+Condition Plugin]
+
+Missing builder
+
+If you're not able to add the builder of your choice within a
+conditional build step (because it's not available within the dropdown),
+then this is likely because the builder does not provide a
+_@DataBoundConstructor_ constructor and/or the Descriptor does not
+extend _hudson.tasks.BuildStepDescriptor_. For non programmers: the
+plugin you would like to use does not yet follow the newest Jenkins
+coding guidelines. Without this, the conditional buildstep plugin is not
+able to work with it.
+
+[[ConditionalBuildStepPlugin-Conditionalstep(single)]]
+== Conditional step (single)
+
+This build step allows you to select any build step and define a
+condition to control whether the step should be executed. +
+For reasons why you might want to use this step, see
+https://wiki.jenkins-ci.org/pages/viewpage.action?pageId=59507542[Why
+use Conditional step (single)?]
+
+[.confluence-embedded-file-wrapper]#image:docs/images/screen-capture-1.jpg[image]#
+
+[[ConditionalBuildStepPlugin-Conditionalsteps(multiple)]]
+== Conditional steps (multiple)
+
+A 'Conditional steps (multiple)' container is able to contain any number
+of any other buildsteps (e.g. Shell, Ant, Maven,...) and you can have
+any number of 'Conditional Steps' containers, each configured with a
+different condition.
+
+[.confluence-embedded-file-wrapper]#image:docs/images/screen-capture-2.jpg[image]#
+
+[[ConditionalBuildStepPlugin-Examples]]
+== Examples
+
+Please check out the examples at the
+https://plugins.jenkins.io/run-condition/[Run
+Condition Plugin]
+
+[[ConditionalBuildStepPlugin-Changelog]]
+== Changelog
+For recent versions, see https://github.com/jenkinsci/conditional-buildstep-plugin/releases[GitHub Releases]
+
+For versions 1.3.6 and older, see CHANGELOG.adoc
+
+
+[[ConditionalBuildStepPlugin-HelpandSupport]]
+== Help and Support
+
+For Help and support please use the
+http://jenkins-ci.org/content/mailing-lists[Jenkins Users] mailing list
+or the Issue tracker (JIRA).
+
+Licensed under [MIT Licence].
