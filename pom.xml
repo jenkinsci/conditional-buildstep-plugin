@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>conditional-buildstep</artifactId>
-	<version>${revision}${changelist}</version>
+	<version>1.4.1</version>
 
 	<packaging>hpi</packaging>
 
@@ -21,7 +21,7 @@
 		<connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/${gitHubRepo}.git</developerConnection>
 		<url>https://github.com/${gitHubRepo}</url>
-	  <tag>${scmTag}</tag>
+	  <tag>conditional-buildstep-1.4.1</tag>
   </scm>
 	<properties>
 		<revision>1.4.1</revision>
