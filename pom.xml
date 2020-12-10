@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>conditional-buildstep</artifactId>
-	<version>1.4.1</version>
+	<version>${revision}${changelist}</version>
 
 	<packaging>hpi</packaging>
 
@@ -21,10 +21,10 @@
 		<connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/${gitHubRepo}.git</developerConnection>
 		<url>https://github.com/${gitHubRepo}</url>
-	  <tag>conditional-buildstep-1.4.1</tag>
+	  <tag>${scmTag}</tag>
   </scm>
 	<properties>
-		<revision>1.4.1</revision>
+		<revision>1.4.2</revision>
 		<changelist>-SNAPSHOT</changelist>
 		<gitHubRepo>jenkinsci/conditional-buildstep-plugin</gitHubRepo>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
