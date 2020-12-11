@@ -4,11 +4,6 @@
 	<f:entry>
 		<f:dropdownDescriptorSelector title="${%condition}" field="runCondition" descriptors="${descriptor.runConditions}" />
 	</f:entry>
-	<f:advanced>
-		<f:entry>
-			<f:dropdownDescriptorSelector title="${%runner}" field="runner" descriptors="${descriptor.buildStepRunners}" />
-		</f:entry>
-	</f:advanced>
 
 	<f:block>
 		<div style="padding-left: 2em">
@@ -24,6 +19,40 @@
 			</fieldset>
 		</div>
 	</f:block>
-
-
+	<f:entry>
+    	<j:scope>
+            <j:set var="descriptor" value="${descriptor.ifElseBlockDescriptor}"/>
+            <f:repeatable items="${instance.conditionalBlocks}" var="instance" name="conditionalBlocks" header="${%ifElseBlock}" add="${%addIfElseBlock}">
+            	<table  width="100%" padding="0">
+            		<st:include page="config.jelly" class="${descriptor.clazz}"/>
+            		<f:entry title="">
+                        <div align="right">
+                            <f:repeatableDeleteButton value="${%Delete}"/>
+                        </div>
+                    </f:entry>
+            	</table>
+        	</f:repeatable>
+        </j:scope>
+    </f:entry>
+	<f:optionalBlock field="useElse" title="${%useElse}" inline="true">
+      	<f:block>
+			<div style="padding-left: 2em">
+				<fieldset style="margin-bottom:1em">
+					<table width="100%">
+						<f:section title="${%stepssection}">
+							<f:nested>
+								<f:hetero-list name="elseBuildSteps" hasHeader="true" descriptors="${descriptor.getBuilderDescriptors(it)}" items="${instance.elseBuildSteps}"
+									addCaption="${%Add step to condition}" />
+							</f:nested>
+						</f:section>
+					</table>
+				</fieldset>
+			</div>
+		</f:block>
+    </f:optionalBlock>
+	<f:advanced>
+		<f:entry>
+			<f:dropdownDescriptorSelector title="${%runner}" field="runner" descriptors="${descriptor.buildStepRunners}" />
+		</f:entry>
+	</f:advanced>
 </j:jelly>
