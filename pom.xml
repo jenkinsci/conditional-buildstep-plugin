@@ -68,6 +68,7 @@
 			<groupId>org.jenkins-ci.main</groupId>
 			<artifactId>maven-plugin</artifactId>
 			<version>3.7</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.jenkins-ci.plugins</groupId>
