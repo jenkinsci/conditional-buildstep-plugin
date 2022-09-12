@@ -36,7 +36,7 @@ builders from a maven project
 
 * fix https://issues.jenkins-ci.org/browse/JENKINS-18135[JENKINS-18135]
 fix compatibility issues
-with https://wiki.jenkins-ci.org/display/JENKINS/Any+Build+Step+Plugin[Any Build Step Plugin]
+with https://plugins.jenkins.io/any-buildstep/[Any Build Step Plugin]
 * lift dependency to core LTS 1.480.3
 
 == 1.2.2 (2. June 2013)
@@ -67,7 +67,7 @@ Multi configuration job
 
 * Fix https://issues.jenkins-ci.org/browse/JENKINS-13112[JENKINS-13112]
 Adding any post-build step as a build step causes exception (caused in
-combination with the https://plugins.jenkins.io/any-buildstep/[Any Build Step Plugin])
+combination with the https://plugins.jenkins.io/any-buildstep/[Any Build Step Plugin]
 
 == 0.0.3 (31. Dec. 2011)
 
