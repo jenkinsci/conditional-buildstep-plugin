@@ -27,6 +27,9 @@
 		<revision>1.4.3</revision>
 		<changelist>-SNAPSHOT</changelist>
 		<gitHubRepo>jenkinsci/conditional-buildstep-plugin</gitHubRepo>
+		<spotbugs.effort>Max</spotbugs.effort>
+		<spotbugs.threshold>Low</spotbugs.threshold>
+		<spotbugs.excludeFilterFile>${project.basedir}/src/spotbugs/spotbugs-excludes.xml</spotbugs.excludeFilterFile>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.javadoc.skip>true</maven.javadoc.skip>
 		<jenkins.version>2.346.3</jenkins.version>
