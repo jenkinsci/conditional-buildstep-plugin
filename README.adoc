@@ -112,7 +112,7 @@ Please report issues and enhancements through the link:Please report issues and 
 
 == Getting Help
 
-For Help please use the https://www.jenkins.io/mailing-lists/[Jenkins Users] mailing list or the Issue tracker (Jira).
+For help please use the https://community.jenkins.io[community forum], https://www.jenkins.io/mailing-lists/[Jenkins users mailing list], or link:https://www.jenkins.io/chat/[chat channels].
 
 == License
 
