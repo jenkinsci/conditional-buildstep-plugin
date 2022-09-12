@@ -66,11 +66,9 @@ public class ConditionalBuildStepHelper {
 
         for (ConditionalBuilder conditionalBuilder : cbuilders) {
             final List<BuildStep> cbs = conditionalBuilder.getConditionalbuilders();
-            if (cbs != null) {
-                for (BuildStep buildStep : cbs) {
-                    if (type.isInstance(buildStep)) {
-                        r.add(type.cast(buildStep));
-                    }
+            for (BuildStep buildStep : cbs) {
+                if (type.isInstance(buildStep)) {
+                    r.add(type.cast(buildStep));
                 }
             }
         }
