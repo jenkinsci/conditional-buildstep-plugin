@@ -29,8 +29,7 @@
 		<gitHubRepo>jenkinsci/conditional-buildstep-plugin</gitHubRepo>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.javadoc.skip>true</maven.javadoc.skip>
-		<jenkins.version>2.289.1</jenkins.version>
-		<java.level>8</java.level>
+		<jenkins.version>2.346.3</jenkins.version>
 	</properties>
 	<licenses>
 		<license>
@@ -95,20 +94,10 @@
 		<dependencies>
 			<dependency>
 				<groupId>io.jenkins.tools.bom</groupId>
-				<artifactId>bom-2.289.x</artifactId>
-				<version>1181.v04b_21d4b_0d6c</version>
+				<artifactId>bom-2.346.x</artifactId>
+				<version>1654.vcb_69d035fa_20</version>
 				<scope>import</scope>
 				<type>pom</type>
-			</dependency>
-			<dependency>
-				<groupId>org.jenkins-ci</groupId>
-				<artifactId>symbol-annotation</artifactId>
-				<version>1.23</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-net</groupId>
-				<artifactId>commons-net</artifactId>
-				<version>3.8.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
