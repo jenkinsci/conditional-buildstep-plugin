@@ -99,10 +99,7 @@ public class ConditionalBuilder extends Builder implements DependencyDeclarer {
     public Collection getProjectActions(AbstractProject<?, ?> project) {
         final Collection projectActions = new ArrayList();
         for (BuildStep buildStep : getConditionalbuilders()) {
-            Collection<? extends Action> pas = buildStep.getProjectActions(project);
-            if(pas != null) {
-                projectActions.addAll(pas);
-            }
+            projectActions.addAll(buildStep.getProjectActions(project));
         }
         return projectActions;
     }
