@@ -73,7 +73,7 @@ public class ConditionalBuilder extends Builder implements DependencyDeclarer {
 
     /**
      * @deprecated  No longer needed as part of the Constructor
-     *  Use {@link #ConditionalBuilder(RunCondition, BuildStepRunner, List<Builder>)}
+     *  Use {@link #ConditionalBuilder(RunCondition, BuildStepRunner, List)}
     */
     @Deprecated
     public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner) {
