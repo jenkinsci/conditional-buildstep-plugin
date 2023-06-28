@@ -27,7 +27,7 @@ public class ConditionalBuildStepHelper {
      * Gets the list of all buildsteps wrapped within any {@link ConditionalBuilder} or {@link SingleConditionalBuilder} from within the given project. Keeps the API backward compatible (Internally
      * calls {@link #getConditionalBuildersFromMavenProject(AbstractProject)})
      * 
-     * @see https://issues.jenkins-ci.org/browse/JENKINS-20543
+     * @see <a href="https://issues.jenkins-ci.org/browse/JENKINS-20543">JENKINS-20543</a>
      * @param p
      *            the project to get all wrapped builders for
      * @param type
@@ -41,7 +41,7 @@ public class ConditionalBuildStepHelper {
     /**
      * Gets the list of all buildsteps wrapped within any {@link ConditionalBuilder} or {@link SingleConditionalBuilder} from within the given project.
      * 
-     * @param p
+     * @param ap
      *            the project to get all wrapped builders for
      * @param type
      *            the type of builders to search for
