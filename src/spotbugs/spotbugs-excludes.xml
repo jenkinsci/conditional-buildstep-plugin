@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <!--
+    Exclusions in this section have been triaged and determined to be false positives.
+  -->
+  <Match>
+    <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE" />
+    <Class name="org.jenkinsci.plugins.conditionalbuildstep.dependency.ConditionalDependencyWrapper" />
+    <Method name="shouldTriggerBuild" />
+  </Match>
+
+  <!--
+    Here lies technical debt. Exclusions in this section have not yet been triaged. When working on
+    on this section, pick an exclusion to triage, then:
+    - If it is a false positive, add a @SuppressFBWarnings(value = "[...]", justification = "[...]")
+      annotation indicating the reason why it is a false positive, then remove the exclusion from
+      this section.
+    - If it is not a false positive, fix the bug, then remove the exclusion from this section.
+   -->
+  <Match>
+    <Bug pattern="BC_UNCONFIRMED_CAST" />
+    <Class name="org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuildStepHelper" />
+    <Method name="getContainedBuilders" />
+  </Match>
+  <Match>
+    <Bug pattern="REC_CATCH_EXCEPTION" />
+    <Class name="org.jenkinsci.plugins.conditionalbuildstep.dependency.ConditionalDependencyWrapper" />
+    <Method name="shouldTriggerBuild" />
+  </Match>
+  <Match>
+    <Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE" />
+    <Class name="org.jenkinsci.plugins.conditionalbuildstep.dependency.ConditionalDependencyGraphWrapper" />
+  </Match>
+  <Match>
+    <Bug pattern="MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR" />
+    <Class name="jenkins.plugins.http_request.HttpRequestGlobalConfig" />
+  </Match>
+  <Match>
+    <Bug pattern="MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR" />
+    <Class name="org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder$SingleConditionalBuilderDescriptor" />
+  </Match>
+</FindBugsFilter>

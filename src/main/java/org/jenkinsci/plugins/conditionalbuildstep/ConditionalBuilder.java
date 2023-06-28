@@ -78,7 +78,7 @@ public class ConditionalBuilder extends Builder implements DependencyDeclarer {
 
     /**
      * @deprecated  No longer needed as part of the Constructor
-     *  Use {@link #ConditionalBuilder(RunCondition, BuildStepRunner, List<Builder>)}
+     *  Use {@link #ConditionalBuilder(RunCondition, BuildStepRunner, List)}
     */
     @Deprecated
     public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner) {
@@ -121,10 +121,7 @@ public class ConditionalBuilder extends Builder implements DependencyDeclarer {
     public Collection getProjectActions(AbstractProject<?, ?> project) {
         final Collection projectActions = new ArrayList();
         for (BuildStep buildStep : getConditionalbuilders()) {
-            Collection<? extends Action> pas = buildStep.getProjectActions(project);
-            if(pas != null) {
-                projectActions.addAll(pas);
-            }
+            projectActions.addAll(buildStep.getProjectActions(project));
         }
         return projectActions;
     }

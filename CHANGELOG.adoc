@@ -1,0 +1,83 @@
+= Version History
+
+== 1.3.6 (9 June 2017)
+
+* Integrate https://issues.jenkins.io/browse/JENKINS-43887[JENKINS-43887]
+upgrade parent pom to 2.x (thanks varyvol
+https://github.com/jenkinsci/conditional-buildstep-plugin/pull/14[#14])
+* ConditionalBuilder now implements DependencyDeclarer (thanks
+TWestling https://github.com/jenkinsci/conditional-buildstep-plugin/pull/12[#12])
+
+== 1.3.5 (16 June 2016)
+
+* Fix
+https://issues.jenkins.io/browse/JENKINS-35526[JENKINS-35526], update
+to DependencyDeclarer
+(https://github.com/jenkinsci/conditional-buildstep-plugin/pull/10[PR#10]
+thanks fbelzunc)
+* Fix https://issues.jenkins.io/browse/JENKINS-34971[JENKINS-34971] describe
+advanced options about failing the evaluation of a condition
+
+== 1.3.3 (13 November 2013)
+
+* Fix https://issues.jenkins.io/browse/JENKINS-20543[JENKINS-20543]
+fix "NoSuchMethodError:
+org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuildStepHelper.getContainedBuilders()"
+
+== 1.3.2 (10 November 2013)
+
+* Add helper (ConditionalBuildStepHelper) to support working with
+wrapped build steps to support
+https://issues.jenkins.io/browse/JENKINS-18967[JENKINS-18967]
+* Enhance ConditionalBuildStepHelper to also return pre- and post
+builders from a maven project
+
+== 1.3 (16 July 2013)
+
+* Fix https://issues.jenkins.io/browse/JENKINS-18135[JENKINS-18135]
+fix compatibility issues
+with https://plugins.jenkins.io/any-buildstep/[Any Build Step Plugin]
+* Lift dependency to core LTS 1.480.3
+
+== 1.2.2 (2 June 2013)
+
+* Fix https://issues.jenkins.io/browse/JENKINS-17836[JENKINS-17836]
+exception if there is no builder defined within the conditional build
+step
+
+== 1.2.1 (1 November 2012)
+
+* Fix https://issues.jenkins.io/browse/JENKINS-13871[JENKINS-13871]
+Using "Conditional build step" and "Parameterized build step" in same
+step is preventing parallel executions of same job
+
+== 1.2 (11 October 2012)
+
+* Fix https://issues.jenkins.io/browse/JENKINS-14118[JENKINS-14118]
+show builds triggered through Conditional build step plugin reported as
+downstream builds for the current build.
+
+== 1.1 (6 May 2012)
+
+* Fix https://issues.jenkins.io/browse/JENKINS-13618[JENKINS-13618]
+Unable to use multiple Conditional Steps in the Prebuild section of
+Multi configuration job
+
+== 1.0 (31 March 2012)
+
+* Fix https://issues.jenkins.io/browse/JENKINS-13112[JENKINS-13112]
+Adding any post-build step as a build step causes exception (caused in
+combination with the https://plugins.jenkins.io/any-buildstep/[Any Build Step Plugin]
+
+== 0.0.3 (31 December 2011)
+
+* Fix https://issues.jenkins.io/browse/JENKINS-12036[JENKINS-12036] conditional build steps plugin does not support matrix build
+
+== 0.0.2 (14 November 2011)
+
+* Integrate https://plugins.jenkins.io/run-condition/[Run Condition Plugin]
+to ease condition extensions, which also fixes https://issues.jenkins.io/browse/JENKINS-11671[JENKINS-11671]
+
+== 0.0.1
+
+* Initial
