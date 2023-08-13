@@ -30,7 +30,7 @@
 		<spotbugs.effort>Max</spotbugs.effort>
 		<spotbugs.threshold>Low</spotbugs.threshold>
 		<spotbugs.excludeFilterFile>${project.basedir}/src/spotbugs/spotbugs-excludes.xml</spotbugs.excludeFilterFile>
-		<jenkins.version>2.361.4</jenkins.version>
+		<jenkins.version>2.387.3</jenkins.version>
 	</properties>
 	<licenses>
 		<license>
@@ -62,12 +62,10 @@
 		<dependency>
 			<groupId>org.jenkins-ci.plugins</groupId>
 			<artifactId>run-condition</artifactId>
-			<version>1.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jenkins-ci.main</groupId>
 			<artifactId>maven-plugin</artifactId>
-			<version>3.16</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -95,8 +93,8 @@
 		<dependencies>
 			<dependency>
 				<groupId>io.jenkins.tools.bom</groupId>
-				<artifactId>bom-2.361.x</artifactId>
-				<version>2102.v854b_fec19c92</version>
+				<artifactId>bom-2.387.x</artifactId>
+				<version>2329.v078520e55c19</version>
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
