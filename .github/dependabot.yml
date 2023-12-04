@@ -1,9 +1,16 @@
-# See the documentation for all configuration options:
-# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
-
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuring-dependabot-version-updates
+---
 version: 2
 updates:
-- package-ecosystem: "maven"
-  directory: "/" # Location of package manifests
-  schedule:
-    interval: "weekly"
+  - package-ecosystem: "maven"
+    directory: "/"
+    labels:
+      - "dependencies"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    labels:
+      - "skip-changelog"
+    schedule:
+      interval: "monthly"
