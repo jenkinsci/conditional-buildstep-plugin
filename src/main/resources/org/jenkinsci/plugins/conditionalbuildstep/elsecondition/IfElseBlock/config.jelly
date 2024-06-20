@@ -1,0 +1,21 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<f:entry>
+        <f:dropdownDescriptorSelector title="${%condition}" field="runCondition" descriptors="${descriptor.runConditions}"
+                default="${descriptor.defaultRunCondition}"/>
+    </f:entry>
+	<f:block>
+		<div style="padding-left: 2em">
+			<fieldset style="margin-bottom:1em">
+				<table width="100%">
+					<f:section title="${%stepssection}">
+						<f:nested>
+							<f:hetero-list name="buildSteps" hasHeader="true" descriptors="${descriptor.getAllowedBuilders(it)}" items="${instance.buildSteps}"
+								addCaption="${%addsteps}" />
+						</f:nested>
+					</f:section>
+				</table>
+			</fieldset>
+		</div>
+	</f:block>
+</j:jelly>
