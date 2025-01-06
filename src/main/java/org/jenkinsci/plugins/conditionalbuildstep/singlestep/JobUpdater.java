@@ -65,7 +65,7 @@ public class JobUpdater {
         final List<Builder> replace = new ArrayList<Builder>();
         for (Builder builder : builders) {
             if (allowed.contains(builder.getDescriptor()))
-                replace.add(new SingleConditionalBuilder((BuildStep) builder, new AlwaysRun(), new BuildStepRunner.Fail()));
+                replace.add(new SingleConditionalBuilder((BuildStep) builder, new AlwaysRun(), new BuildStepRunner.Fail(),null,false,null));
             else
                 replace.add(builder);
         }
