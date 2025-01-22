@@ -52,7 +52,7 @@ import org.jenkinsci.plugins.conditionalbuildstep.dependency.ConditionalDependen
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder.SingleConditionalBuilderDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 /**
  * A buildstep wrapping any number of other buildsteps, controlling their execution based on a defined condition.
@@ -161,7 +161,7 @@ public class ConditionalBuilder extends Builder implements DependencyDeclarer {
         }
 
         @Override
-        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+        public boolean configure(StaplerRequest2 req, JSONObject formData) throws FormException {
             save();
             return super.configure(req, formData);
         }

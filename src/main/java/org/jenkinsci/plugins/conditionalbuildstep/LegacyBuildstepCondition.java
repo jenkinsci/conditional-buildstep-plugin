@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
