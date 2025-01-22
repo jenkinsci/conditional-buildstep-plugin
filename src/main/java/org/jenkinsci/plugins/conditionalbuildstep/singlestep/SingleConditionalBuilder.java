@@ -55,7 +55,7 @@ import org.jenkinsci.plugins.conditionalbuildstep.lister.BuilderDescriptorLister
 import org.jenkinsci.plugins.conditionalbuildstep.lister.DefaultBuilderDescriptorLister;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 /**
  * 
@@ -142,7 +142,7 @@ public class SingleConditionalBuilder extends Builder implements DependencyDecla
         }
 
         @Override
-        public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+        public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
             final SingleConditionalBuilderDescriptor newConfig = req.bindJSON(SingleConditionalBuilderDescriptor.class, json);
             if (newConfig.builderLister != null)
                 builderLister = newConfig.builderLister;
@@ -179,7 +179,7 @@ public class SingleConditionalBuilder extends Builder implements DependencyDecla
 
         public List<? extends Descriptor<? extends BuildStep>> getAllowedBuilders(AbstractProject<?, ?> project) {
             if (project == null)
-                project = Stapler.getCurrentRequest().findAncestorObject(AbstractProject.class);
+                project = Stapler.getCurrentRequest2().findAncestorObject(AbstractProject.class);
             return builderLister.getAllowedBuilders(project);
         }
 
