@@ -39,6 +39,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -51,6 +52,8 @@ import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
 import org.jenkins_ci.plugins.run_condition.core.AlwaysRun;
 import org.jenkinsci.plugins.conditionalbuildstep.Messages;
 import org.jenkinsci.plugins.conditionalbuildstep.dependency.ConditionalDependencyGraphWrapper;
+import org.jenkinsci.plugins.conditionalbuildstep.elsecondition.SingleIfElseBlock;
+import org.jenkinsci.plugins.conditionalbuildstep.elsecondition.SingleIfElseBlock.SingleIfElseBlockDescriptor;
 import org.jenkinsci.plugins.conditionalbuildstep.lister.BuilderDescriptorLister;
 import org.jenkinsci.plugins.conditionalbuildstep.lister.DefaultBuilderDescriptorLister;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -69,12 +72,18 @@ public class SingleConditionalBuilder extends Builder implements DependencyDecla
     private final RunCondition condition;
     private final BuildStep buildStep;
     private final BuildStepRunner runner;
+    private List<SingleIfElseBlock> conditionalBlocks;
+    private boolean useElse;
+    private BuildStep elseBuildStep;
 
     @DataBoundConstructor
-    public SingleConditionalBuilder(final BuildStep buildStep, final RunCondition condition, final BuildStepRunner runner) {
+    public SingleConditionalBuilder(final BuildStep buildStep, final RunCondition condition, final BuildStepRunner runner,final List<SingleIfElseBlock> conditionalBlocks,final boolean useElse,final BuildStep elseBuildStep) {
         this.buildStep = buildStep;
         this.condition = condition;
         this.runner = runner;
+        this.conditionalBlocks = conditionalBlocks;
+        this.useElse = useElse;
+        this.elseBuildStep = elseBuildStep;
     }
 
     public BuildStep getBuildStep() {
@@ -88,6 +97,19 @@ public class SingleConditionalBuilder extends Builder implements DependencyDecla
     public BuildStepRunner getRunner() {
         return runner;
     }
+    
+    public List<SingleIfElseBlock> getConditionalBlocks(){
+    	if(conditionalBlocks==null) this.conditionalBlocks = new ArrayList<SingleIfElseBlock>();
+    	return conditionalBlocks;
+    }
+    
+    public boolean getUseElse() {
+        return useElse;
+    }
+
+    public BuildStep getElseBuildStep() {
+        return elseBuildStep;
+    }
 
     public BuildStepMonitor getRequiredMonitorService() {
         return buildStep == null ? BuildStepMonitor.NONE : buildStep.getRequiredMonitorService();
@@ -100,12 +122,54 @@ public class SingleConditionalBuilder extends Builder implements DependencyDecla
 
     @Override
     public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
-        return runner.prebuild(condition, buildStep, build, listener);
+		try {
+			if(condition.runPerform(build, listener)){
+				return buildStep.prebuild(build, listener);
+			}
+			if(conditionalBlocks!=null){
+				for(SingleIfElseBlock block: conditionalBlocks){
+					RunCondition runCondition = block.getRunCondition();
+					if(runCondition!=null && runCondition.runPerform(build, listener)){
+						BuildStep ifElseBuildStep = block.getBuildStep();
+						if(ifElseBuildStep!=null){
+							return ifElseBuildStep.prebuild(build, listener);
+						}
+					}
+				}
+			}
+			if(useElse && elseBuildStep!=null){
+				return elseBuildStep.prebuild(build, listener);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return false;
     }
 
     @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
-        return runner.perform(condition, buildStep, build, launcher, listener);
+		try {
+			if(condition.runPerform(build, listener)){
+				return buildStep.perform(build, launcher, listener);
+			}
+			if(conditionalBlocks!=null){
+				for(SingleIfElseBlock block: conditionalBlocks){
+					RunCondition runCondition = block.getRunCondition();
+					if(runCondition!=null && runCondition.runPerform(build, listener)){
+						BuildStep ifElseBuildStep = block.getBuildStep();
+						if(ifElseBuildStep!=null){
+							return ifElseBuildStep.perform(build, launcher, listener);
+						}
+					}
+				}
+			}
+			if(useElse&&elseBuildStep!=null){
+				return elseBuildStep.perform(build, launcher, listener);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return false;
     }
     
     public void buildDependencyGraph(AbstractProject project, DependencyGraph graph) {
@@ -167,6 +231,10 @@ public class SingleConditionalBuilder extends Builder implements DependencyDecla
 
         public BuildStepRunner.BuildStepRunnerDescriptor getDefaultBuildStepRunner() {
             return Hudson.getInstance().getDescriptorByType(BuildStepRunner.Fail.FailDescriptor.class);
+        }
+        
+        public SingleIfElseBlockDescriptor getIfElseBlockDescriptor() {
+            return Hudson.getInstance().getDescriptorByType(SingleIfElseBlockDescriptor.class);
         }
 
         public List<? extends Descriptor<? extends RunCondition>> getRunConditions() {
