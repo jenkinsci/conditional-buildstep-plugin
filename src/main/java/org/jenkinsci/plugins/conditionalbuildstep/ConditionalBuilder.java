@@ -49,6 +49,8 @@ import net.sf.json.JSONObject;
 import org.jenkins_ci.plugins.run_condition.RunCondition;
 import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
 import org.jenkinsci.plugins.conditionalbuildstep.dependency.ConditionalDependencyGraphWrapper;
+import org.jenkinsci.plugins.conditionalbuildstep.elsecondition.IfElseBlock;
+import org.jenkinsci.plugins.conditionalbuildstep.elsecondition.IfElseBlock.IfElseBlockDescriptor;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder;
 import org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder.SingleConditionalBuilderDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -70,6 +72,9 @@ public class ConditionalBuilder extends Builder implements DependencyDeclarer {
     private final BuildStepRunner runner;
     private RunCondition runCondition;
     private List<BuildStep> conditionalbuilders;
+    private List<IfElseBlock> conditionalBlocks;
+    private boolean useElse;
+    private List<BuildStep> elseBuildSteps;
 
     /**
      * @deprecated  No longer needed as part of the Constructor
@@ -78,14 +83,17 @@ public class ConditionalBuilder extends Builder implements DependencyDeclarer {
     @Deprecated
     public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner) {
         //List<Builder> builders = new ArrayList<Builder>();
-        this(runCondition, runner, new ArrayList<BuildStep>());
+        this(runCondition, runner, new ArrayList<BuildStep>(),null,false,null);
     }
 
     @DataBoundConstructor
-    public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner, List<BuildStep> conditionalbuilders) {
+    public ConditionalBuilder(RunCondition runCondition, final BuildStepRunner runner, List<BuildStep> conditionalbuilders,List<IfElseBlock> conditionalBlocks, boolean useElse, List<BuildStep> elseBuildSteps) {
         this.runner = runner;
         this.runCondition = runCondition;
         this.conditionalbuilders = conditionalbuilders;
+        this.conditionalBlocks = conditionalBlocks;
+        this.useElse = useElse;
+        this.elseBuildSteps = elseBuildSteps;
     }
     public BuildStepRunner getRunner() {
         return runner;
@@ -93,6 +101,20 @@ public class ConditionalBuilder extends Builder implements DependencyDeclarer {
 
     public RunCondition getRunCondition() {
         return runCondition;
+    }
+    
+    public List<IfElseBlock> getConditionalBlocks(){
+    	if(conditionalBlocks == null) conditionalBlocks = new ArrayList<IfElseBlock>();
+    	return conditionalBlocks;
+    }
+    
+    public boolean getUseElse(){
+    	return useElse;
+    }
+    
+    public List<BuildStep> getElseBuildSteps(){
+    	if(elseBuildSteps == null) elseBuildSteps = new ArrayList<BuildStep>();
+    	return elseBuildSteps;
     }
     
     @Override
@@ -123,12 +145,56 @@ public class ConditionalBuilder extends Builder implements DependencyDeclarer {
 
     @Override
     public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
-        return runner.prebuild(runCondition, new BuilderChain(getConditionalbuilders()), build, listener);
+    	try{
+    		if(runCondition.runPerform(build, listener)){
+    			return new BuilderChain(getConditionalbuilders()).prebuild(build, listener);
+    		}
+    		if(conditionalBlocks!=null){
+				for(IfElseBlock block: conditionalBlocks){
+					RunCondition runCondition = block.getRunCondition();
+					if(runCondition!=null && runCondition.runPerform(build, listener)){
+						List<BuildStep> buildSteps = block.getBuildSteps();
+						if(buildSteps!=null){
+							return new BuilderChain(buildSteps).prebuild(build, listener);
+						}
+					}
+				}
+			}
+    		if(useElse && elseBuildSteps!=null){
+				return new BuilderChain(getElseBuildSteps()).prebuild(build, listener);
+			}
+    	}
+    	catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	return false;
     }
 
     @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
-        return runner.perform(runCondition, new BuilderChain(getConditionalbuilders()), build, launcher, listener);
+    	try{
+    		if(runCondition.runPerform(build, listener)){
+    			return new BuilderChain(getConditionalbuilders()).perform(build, launcher, listener);
+    		}
+    		if(conditionalBlocks!=null){
+				for(IfElseBlock block: conditionalBlocks){
+					RunCondition runCondition = block.getRunCondition();
+					if(runCondition!=null && runCondition.runPerform(build, listener)){
+						List<BuildStep> buildSteps = block.getBuildSteps();
+						if(buildSteps!=null){
+							return new BuilderChain(buildSteps).perform(build, launcher, listener);
+						}
+					}
+				}
+			}
+    		if(useElse && elseBuildSteps!=null){
+				return new BuilderChain(getElseBuildSteps()).perform(build, launcher, listener);
+			}
+    	}
+    	catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	return false;
     }
 
     public Object readResolve() {
@@ -178,6 +244,10 @@ public class ConditionalBuilder extends Builder implements DependencyDeclarer {
 
         public List<? extends Descriptor<? extends RunCondition>> getRunConditions() {
             return RunCondition.all();
+        }
+        
+        public IfElseBlockDescriptor getIfElseBlockDescriptor() {
+            return Hudson.getInstance().getDescriptorByType(IfElseBlockDescriptor.class);
         }
 
     }
