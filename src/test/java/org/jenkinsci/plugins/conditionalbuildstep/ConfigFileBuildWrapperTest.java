@@ -3,24 +3,22 @@ package org.jenkinsci.plugins.conditionalbuildstep;
 import hudson.maven.MavenModuleSet;
 import hudson.model.FreeStyleProject;
 import hudson.tasks.Shell;
+import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
+import org.jenkins_ci.plugins.run_condition.core.BooleanCondition;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 import java.util.List;
 
-import org.jenkins_ci.plugins.run_condition.BuildStepRunner;
-import org.jenkins_ci.plugins.run_condition.core.BooleanCondition;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ConfigFileBuildWrapperTest {
-
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
+@WithJenkins
+class ConfigFileBuildWrapperTest {
 
     @Test
-    public void conditionalBuildersInMavenProjectMustBeResolvable() throws Exception {
-
+    void conditionalBuildersInMavenProjectMustBeResolvable(JenkinsRule j) throws Exception {
         final MavenModuleSet p = j.createProject(MavenModuleSet.class, "mvn");
         p.setRunHeadless(true);
 
@@ -30,13 +28,12 @@ public class ConfigFileBuildWrapperTest {
         p.getPrebuilders().add(cBuilder);
 
         final List<Shell> containedBuilders = ConditionalBuildStepHelper.getContainedBuilders(p, Shell.class);
-        Assert.assertNotNull("no builders returned", containedBuilders);
-        Assert.assertEquals("not correct nummber of builders returned", 1, containedBuilders.size());
+        assertNotNull(containedBuilders, "no builders returned");
+        assertEquals(1, containedBuilders.size(), "not correct number of builders returned");
     }
 
     @Test
-    public void conditionalBuildersInFreestyleProjectMustBeResolvable() throws Exception {
-
+    void conditionalBuildersInFreestyleProjectMustBeResolvable(JenkinsRule j) throws Exception {
         final FreeStyleProject p = j.createFreeStyleProject();
 
         ConditionalBuilder cBuilder = new ConditionalBuilder(new BooleanCondition("true"), new BuildStepRunner.Run());
@@ -47,8 +44,7 @@ public class ConfigFileBuildWrapperTest {
         p.getBuildersList().add(cBuilder);
 
         final List<Shell> containedBuilders = ConditionalBuildStepHelper.getContainedBuilders(p, Shell.class);
-        Assert.assertNotNull("no builders returned", containedBuilders);
-        Assert.assertEquals("not correct nummber of builders returned", 2, containedBuilders.size());
+        assertNotNull(containedBuilders, "no builders returned");
+        assertEquals(2, containedBuilders.size(), "not correct number of builders returned");
     }
-
 }
